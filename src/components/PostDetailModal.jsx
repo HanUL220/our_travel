@@ -1,6 +1,7 @@
 import React from 'react';
 import { X, MapPin, Calendar, CalendarDays, Edit2, Trash2, Image as ImageIcon } from 'lucide-react';
 import { formatImageUrl } from '../utils/imageUtils';
+import { formatDisplayDate } from '../utils/dateUtils';
 
 export default function PostDetailModal({ post, onClose, onEditPost, onDeletePost }) {
   if (!post) return null;
@@ -14,7 +15,7 @@ export default function PostDetailModal({ post, onClose, onEditPost, onDeletePos
 
   const hasBlocks = post.blocks && Array.isArray(post.blocks) && post.blocks.length > 0;
   const isMultiDay = post.tripType === 'multi' || (post.startDate && post.endDate && post.startDate !== post.endDate) || post.date?.includes(' ~ ');
-  const displayDateText = post.date || post.startDate || '';
+  const displayDateText = formatDisplayDate(post.date || post.startDate || '');
 
   return (
     <div className="modal-overlay" onClick={onClose}>
@@ -86,7 +87,7 @@ export default function PostDetailModal({ post, onClose, onEditPost, onDeletePos
                       <div key={block.id || idx} className="apple-day-divider">
                         <div className="apple-day-pill">
                           <span className="apple-day-title">{block.dayTitle || '일정'}</span>
-                          {block.dayDate && <span className="apple-day-date">{block.dayDate}</span>}
+                          {block.dayDate && <span className="apple-day-date">{formatDisplayDate(block.dayDate)}</span>}
                         </div>
                         <div className="apple-day-line" />
                       </div>
@@ -100,27 +101,28 @@ export default function PostDetailModal({ post, onClose, onEditPost, onDeletePos
                   case 'text':
                     return (
                       <div key={block.id || idx} className="apple-block-text">
-                        {block.content.split('\n').map((line, i) => (
-                          <p key={i}>{line}</p>
-                        ))}
+                        <p>{block.content}</p>
                       </div>
                     );
                   case 'image':
                     return (
                       <figure key={block.id || idx} className="apple-block-figure">
-                        <img 
-                          src={formatImageUrl(block.url)} 
-                          alt={block.caption || '여행 사진'} 
-                          className="apple-block-img"
-                          onError={(e) => {
-                            e.target.src = "https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&w=1200&q=80";
-                          }}
-                        />
+                        {block.url ? (
+                          <img 
+                            src={formatImageUrl(block.url)} 
+                            alt={block.caption || '여행 사진'} 
+                            className="apple-block-img"
+                            loading="lazy"
+                            onError={(e) => { e.target.style.display = 'none'; }}
+                          />
+                        ) : (
+                          <div style={{ padding: '2rem', background: 'var(--apple-canvas)', borderRadius: 'var(--radius-card)', color: 'var(--apple-muted)', fontSize: '13px' }}>
+                            <ImageIcon size={24} style={{ marginBottom: '0.4rem', opacity: 0.5 }} />
+                            <div>등록된 사진이 없습니다.</div>
+                          </div>
+                        )}
                         {block.caption && (
-                          <figcaption className="apple-block-caption">
-                            <ImageIcon size={13} style={{ display: 'inline', marginRight: '4px', verticalAlign: 'middle' }} />
-                            {block.caption}
-                          </figcaption>
+                          <figcaption className="apple-block-caption">{block.caption}</figcaption>
                         )}
                       </figure>
                     );
@@ -130,9 +132,7 @@ export default function PostDetailModal({ post, onClose, onEditPost, onDeletePos
               })
             ) : (
               <div className="apple-block-text">
-                {post.content && post.content.split('\n').map((line, i) => (
-                  <p key={i}>{line}</p>
-                ))}
+                <p>{post.content || '작성된 본문 내용이 없습니다.'}</p>
               </div>
             )}
           </article>

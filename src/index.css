@@ -396,14 +396,16 @@ input, textarea, select {
 
 .apple-search-icon {
   position: absolute;
-  left: 14px;
+  left: 16px;
   color: var(--apple-muted);
   pointer-events: none;
+  z-index: 2;
 }
 
-.apple-search-input {
-  width: 100%;
-  padding: 10px 38px 10px 38px;
+.apple-search-input,
+input.apple-search-input {
+  width: 100% !important;
+  padding: 11px 40px 11px 44px !important;
   background: var(--apple-surface);
   border: 1px solid var(--apple-border);
   border-radius: var(--radius-pill);
@@ -412,6 +414,7 @@ input, textarea, select {
   outline: none;
   box-shadow: var(--shadow-subtle);
   transition: var(--apple-transition);
+  box-sizing: border-box !important;
 }
 
 .apple-search-input:focus {
@@ -421,12 +424,13 @@ input, textarea, select {
 
 .apple-search-clear {
   position: absolute;
-  right: 12px;
+  right: 14px;
   color: var(--apple-muted);
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 4px;
+  z-index: 2;
 }
 
 /* ==========================================================================

@@ -1,10 +1,12 @@
 import React from 'react';
 import { MapPin, Calendar, CalendarDays } from 'lucide-react';
 import { formatImageUrl } from '../utils/imageUtils';
+import { formatDisplayDate } from '../utils/dateUtils';
 
 export default function PostCard({ post, onSelectPost }) {
   const imageUrl = formatImageUrl(post.mainImage);
   const isMultiDay = post.tripType === 'multi' || post.date?.includes(' ~ ');
+  const formattedDate = formatDisplayDate(post.date);
 
   return (
     <article className="post-card" onClick={() => onSelectPost(post)}>
@@ -27,7 +29,7 @@ export default function PostCard({ post, onSelectPost }) {
         <div className="card-meta">
           <div className="card-meta-item">
             {isMultiDay ? <CalendarDays size={13} className="meta-icon" /> : <Calendar size={13} className="meta-icon" />}
-            <span>{post.date}</span>
+            <span>{formattedDate}</span>
           </div>
           <div className="card-meta-item">
             <MapPin size={13} className="meta-icon" />
