@@ -9,13 +9,21 @@ import Footer from './components/Footer';
 
 import { initialPosts } from './data/travelPosts';
 import { Frown } from 'lucide-react';
+import { 
+  fetchPostsFromSupabase, 
+  savePostToSupabase, 
+  deletePostFromSupabase,
+  isSupabaseConfigured 
+} from './utils/supabaseClient';
 
 export default function App() {
-  // Posts state with LocalStorage persistence
+  // Posts state with LocalStorage persistence & Supabase fallback
   const [posts, setPosts] = useState(() => {
     const saved = localStorage.getItem('our_travel_posts');
     return saved ? JSON.parse(saved) : initialPosts;
   });
+
+  const [isLoading, setIsLoading] = useState(isSupabaseConfigured);
 
   // Theme state
   const [theme, setTheme] = useState(() => {
@@ -30,13 +38,39 @@ export default function App() {
   const [isEditorOpen, setIsEditorOpen] = useState(false);
   const [postToEdit, setPostToEdit] = useState(null);
 
+  // Fetch posts from Supabase on mount if configured
+  useEffect(() => {
+    async function loadCloudPosts() {
+      if (!isSupabaseConfigured) return;
+      try {
+        const cloudPosts = await fetchPostsFromSupabase();
+        if (cloudPosts && Array.isArray(cloudPosts)) {
+          if (cloudPosts.length > 0) {
+            setPosts(cloudPosts);
+          } else {
+            // If Supabase table is brand new & empty, seed with initialPosts to Supabase
+            setPosts(initialPosts);
+            for (const post of initialPosts) {
+              await savePostToSupabase(post).catch(() => {});
+            }
+          }
+        }
+      } catch (err) {
+        console.warn('Could not load posts from Supabase, using local data:', err);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    loadCloudPosts();
+  }, []);
+
   // Sync theme with HTML document
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
     localStorage.setItem('our_travel_theme', theme);
   }, [theme]);
 
-  // Sync posts to LocalStorage
+  // Sync posts to LocalStorage as offline backup
   useEffect(() => {
     localStorage.setItem('our_travel_posts', JSON.stringify(posts));
   }, [posts]);
@@ -55,26 +89,47 @@ export default function App() {
     setIsEditorOpen(true);
   };
 
-  const handleSavePost = (savedPost) => {
+  const handleSavePost = async (savedPost) => {
+    // 1. Optimistic / local state update
     setPosts(prev => {
-      const exists = prev.some(p => p.id === savedPost.id);
+      const exists = prev.some(p => String(p.id) === String(savedPost.id));
       if (exists) {
-        return prev.map(p => p.id === savedPost.id ? savedPost : p);
+        return prev.map(p => String(p.id) === String(savedPost.id) ? savedPost : p);
       } else {
         return [savedPost, ...prev];
       }
     });
 
     // Update currently viewed post if open
-    if (selectedPost && selectedPost.id === savedPost.id) {
+    if (selectedPost && String(selectedPost.id) === String(savedPost.id)) {
       setSelectedPost(savedPost);
+    }
+
+    // 2. Cloud DB sync
+    if (isSupabaseConfigured) {
+      try {
+        await savePostToSupabase(savedPost);
+      } catch (err) {
+        console.error('Failed to sync post to Supabase:', err);
+        alert('클라우드 저장 중 오류가 발생하여 기기 로컬에 저장되었습니다.');
+      }
     }
   };
 
-  const handleDeletePost = (postId) => {
-    setPosts(prev => prev.filter(p => p.id !== postId));
-    if (selectedPost && selectedPost.id === postId) {
+  const handleDeletePost = async (postId) => {
+    // 1. Local state update
+    setPosts(prev => prev.filter(p => String(p.id) !== String(postId)));
+    if (selectedPost && String(selectedPost.id) === String(postId)) {
       setSelectedPost(null);
+    }
+
+    // 2. Cloud DB sync
+    if (isSupabaseConfigured) {
+      try {
+        await deletePostFromSupabase(postId);
+      } catch (err) {
+        console.error('Failed to delete post from Supabase:', err);
+      }
     }
   };
 

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { X, ArrowUp, ArrowDown, Trash2, Image as ImageIcon, Type, Heading, Calendar, CalendarDays, Link } from 'lucide-react';
-import { formatImageUrl } from '../utils/imageUtils';
+import { X, ArrowUp, ArrowDown, Trash2, Image as ImageIcon, Type, Heading, Calendar, CalendarDays } from 'lucide-react';
+import ImageUploader from './ImageUploader';
 
 export default function PostEditorModal({ onClose, onSavePost, postToEdit = null }) {
   const isEditMode = Boolean(postToEdit);
@@ -278,31 +278,14 @@ export default function PostEditorModal({ onClose, onSavePost, postToEdit = null
                 </>
               )}
 
-              {/* Main Cover Image Link */}
+              {/* Main Cover Image Uploader */}
               <div className="apple-form-group" style={{ marginTop: '0.8rem', marginBottom: 0 }}>
-                <label className="apple-form-label">
-                  대표 사진 이미지 링크 (구글 드라이브 / 웹 이미지 URL)
-                </label>
-                <input 
-                  type="text" 
-                  className="apple-input full-width-input" 
-                  placeholder="https://drive.google.com/file/d/... 또는 이미지 URL"
+                <ImageUploader 
+                  label="대표 사진 이미지"
                   value={mainImage}
-                  onChange={(e) => setMainImage(e.target.value)}
+                  onChange={(newUrl) => setMainImage(newUrl)}
+                  placeholder="https://drive.google.com/file/d/... 또는 이미지 URL"
                 />
-                <span className="apple-hint-text">
-                  <Link size={12} style={{ display: 'inline', marginRight: '3px', verticalAlign: 'middle' }} />
-                  구글 드라이브 공유 링크를 붙여넣으시면 자동으로 웹 이미지로 변환됩니다.
-                </span>
-                {mainImage.trim() && (
-                  <div className="apple-cover-preview">
-                    <img 
-                      src={formatImageUrl(mainImage)} 
-                      alt="대표 사진 미리보기" 
-                      onError={(e) => { e.target.style.display = 'none'; }}
-                    />
-                  </div>
-                )}
               </div>
             </div>
 
@@ -419,13 +402,12 @@ export default function PostEditorModal({ onClose, onSavePost, postToEdit = null
                       )}
 
                       {block.type === 'image' && (
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', width: '100%' }}>
-                          <input 
-                            type="text" 
-                            className="apple-input full-width-input" 
-                            placeholder="사진 URL 또는 구글 드라이브 링크를 입력하세요"
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem', width: '100%' }}>
+                          <ImageUploader 
                             value={block.url || ''}
-                            onChange={(e) => updateBlock(block.id, 'url', e.target.value)}
+                            onChange={(newUrl) => updateBlock(block.id, 'url', newUrl)}
+                            placeholder="사진 URL 또는 구글 드라이브 링크를 입력하세요"
+                            compact={true}
                           />
                           <input 
                             type="text" 
@@ -434,15 +416,6 @@ export default function PostEditorModal({ onClose, onSavePost, postToEdit = null
                             value={block.caption || ''}
                             onChange={(e) => updateBlock(block.id, 'caption', e.target.value)}
                           />
-                          {block.url && block.url.trim() && (
-                            <div className="apple-img-preview">
-                              <img 
-                                src={formatImageUrl(block.url)} 
-                                alt="미리보기" 
-                                onError={(e) => { e.target.style.display = 'none'; }}
-                              />
-                            </div>
-                          )}
                         </div>
                       )}
                     </div>

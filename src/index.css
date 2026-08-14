@@ -1270,3 +1270,262 @@ input[type="date"]::-webkit-date-and-time-value {
   color: var(--apple-muted);
   opacity: 0.8;
 }
+
+/* ==========================================================================
+   Apple Image Uploader & Dropzone
+   ========================================================================== */
+.apple-image-uploader {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.apple-uploader-tabs {
+  display: flex;
+  gap: 0.35rem;
+  background: var(--apple-card-bg);
+  padding: 3px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--apple-border);
+  width: fit-content;
+  margin-bottom: 0.4rem;
+}
+
+.apple-uploader-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 4px 10px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--apple-muted);
+  border: none;
+  background: transparent;
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+  transition: var(--apple-transition);
+}
+
+.apple-uploader-tab:hover {
+  color: var(--apple-foreground);
+}
+
+.apple-uploader-tab.active {
+  background: var(--apple-surface);
+  color: var(--apple-foreground);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  font-weight: 600;
+}
+
+.apple-dropzone {
+  border: 1.5px dashed var(--apple-border);
+  background: var(--apple-canvas);
+  border-radius: var(--radius-compact);
+  padding: 1.25rem 1rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.25, 1, 0.5, 1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 110px;
+}
+
+.apple-image-uploader.compact .apple-dropzone {
+  padding: 0.9rem 0.8rem;
+  min-height: 90px;
+}
+
+.apple-dropzone:hover {
+  border-color: var(--apple-blue);
+  background: var(--apple-blue-light);
+}
+
+.apple-dropzone.drag-over {
+  border-color: var(--apple-blue);
+  background: var(--apple-blue-light);
+  transform: scale(1.01);
+  border-style: solid;
+}
+
+.apple-dropzone.uploading {
+  cursor: default;
+  border-style: solid;
+  border-color: var(--apple-blue);
+  background: var(--apple-blue-light);
+}
+
+.apple-dropzone-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.apple-dropzone-icon-circle {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--apple-surface);
+  border: 1px solid var(--apple-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--apple-blue);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.apple-dropzone-title {
+  font-size: 13px;
+  color: var(--apple-foreground);
+  margin: 0;
+  font-weight: 400;
+}
+
+.apple-dropzone-title strong {
+  color: var(--apple-blue);
+  font-weight: 600;
+}
+
+.apple-dropzone-subtitle {
+  font-size: 11px;
+  color: var(--apple-muted);
+}
+
+.apple-link-input-box {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.apple-input-with-icon {
+  position: relative;
+  width: 100%;
+}
+
+.apple-input-with-icon .apple-input {
+  padding-left: 2.2rem;
+}
+
+.apple-input-icon {
+  position: absolute;
+  left: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--apple-muted);
+  pointer-events: none;
+}
+
+.apple-uploader-preview-card {
+  border: 1px solid var(--apple-border);
+  border-radius: var(--radius-compact);
+  background: var(--apple-card-bg);
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+}
+
+.apple-uploader-img-wrapper {
+  width: 100%;
+  max-height: 180px;
+  overflow: hidden;
+  background: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.apple-image-uploader.compact .apple-uploader-img-wrapper {
+  max-height: 140px;
+}
+
+.apple-uploader-img-wrapper img {
+  width: 100%;
+  height: 100%;
+  max-height: 180px;
+  object-fit: cover;
+  display: block;
+}
+
+.apple-image-uploader.compact .apple-uploader-img-wrapper img {
+  max-height: 140px;
+}
+
+.apple-uploader-preview-info {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 0.75rem;
+  background: var(--apple-surface);
+  border-top: 1px solid var(--apple-border);
+}
+
+.apple-uploader-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--apple-foreground);
+}
+
+.apple-uploader-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.apple-btn-outline-sm {
+  padding: 3px 9px;
+  font-size: 12px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--apple-border);
+  background: var(--apple-surface);
+  color: var(--apple-foreground);
+  font-weight: 500;
+  cursor: pointer;
+  transition: var(--apple-transition);
+}
+
+.apple-btn-outline-sm:hover {
+  background: var(--apple-canvas);
+  border-color: var(--apple-blue);
+  color: var(--apple-blue);
+}
+
+.apple-btn-danger-sm {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 1px solid var(--apple-border);
+  background: var(--apple-surface);
+  color: #ef4444;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: var(--apple-transition);
+}
+
+.apple-btn-danger-sm:hover {
+  background: #fee2e2;
+  border-color: #ef4444;
+}
+
+.apple-uploader-error {
+  font-size: 12px;
+  color: #ef4444;
+  margin-top: 0.25rem;
+  font-weight: 500;
+}
+
+.apple-spin {
+  animation: appleSpin 0.9s linear infinite;
+  color: var(--apple-blue);
+}
+
+@keyframes appleSpin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
