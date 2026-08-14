@@ -152,21 +152,23 @@ export default function PostEditorModal({ onClose, onSavePost, postToEdit = null
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-card apple-modal-card apple-editor-card" onClick={(e) => e.stopPropagation()}>
-        <div className="apple-modal-header">
-          <h2 className="apple-modal-title">
-            {isEditMode ? '여행 기록 수정' : '새로운 여행 기록'}
-          </h2>
-          <button className="apple-close-btn" onClick={onClose} aria-label="닫기">
-            <X size={18} />
-          </button>
-        </div>
+        <form onSubmit={handleSubmit} className="apple-modal-form">
+          {/* Pinned Top Header */}
+          <div className="apple-modal-header">
+            <h2 className="apple-modal-title">
+              {isEditMode ? '여행 기록 수정' : '새로운 여행 기록'}
+            </h2>
+            <button type="button" className="apple-close-btn" onClick={onClose} aria-label="닫기">
+              <X size={18} />
+            </button>
+          </div>
 
-        <div className="apple-modal-body">
-          <p className="apple-editor-desc">
-            일정(날짜)별 구분과 사진, 글, 소제목을 원하는 순서대로 자유롭게 배치하세요.
-          </p>
+          {/* Scrollable Body */}
+          <div className="apple-modal-body">
+            <p className="apple-editor-desc">
+              일정(날짜)별 구분과 사진, 글, 소제목을 원하는 순서대로 자유롭게 배치하세요.
+            </p>
 
-          <form onSubmit={handleSubmit}>
             {/* General Info Section */}
             <div className="apple-section-card">
               <h4 className="apple-section-header">기본 정보</h4>
@@ -206,7 +208,7 @@ export default function PostEditorModal({ onClose, onSavePost, postToEdit = null
                 </div>
               </div>
 
-              {/* Dates & Location */}
+              {/* Dates & Location (Stacks cleanly on mobile) */}
               {tripType === 'single' ? (
                 <div className="apple-grid-2">
                   <div className="apple-form-group">
@@ -289,7 +291,7 @@ export default function PostEditorModal({ onClose, onSavePost, postToEdit = null
                   onChange={(e) => setMainImage(e.target.value)}
                 />
                 <span className="apple-hint-text">
-                  <Link size={12} style={{ display: 'inline', marginRight: '3px' }} />
+                  <Link size={12} style={{ display: 'inline', marginRight: '3px', verticalAlign: 'middle' }} />
                   구글 드라이브 공유 링크를 붙여넣으시면 자동으로 웹 이미지로 변환됩니다.
                 </span>
                 {mainImage.trim() && (
@@ -385,7 +387,7 @@ export default function PostEditorModal({ onClose, onSavePost, postToEdit = null
                           />
                           <input 
                             type="date" 
-                            className="apple-input apple-date-input" 
+                            className="apple-input full-width-input apple-date-input" 
                             value={block.dayDate || ''}
                             onChange={(e) => updateBlock(block.id, 'dayDate', e.target.value)}
                             title="해당 날짜 선택"
@@ -448,22 +450,22 @@ export default function PostEditorModal({ onClose, onSavePost, postToEdit = null
                 ))}
               </div>
             </div>
+          </div>
 
-            {/* Bottom Actions: Marketing Primary + Secondary */}
-            <div className="apple-modal-footer">
-              <button 
-                type="button" 
-                className="apple-btn-secondary" 
-                onClick={onClose}
-              >
-                취소
-              </button>
-              <button type="submit" className="apple-btn-primary">
-                {isEditMode ? '수정 내용 저장' : '추억 저장'}
-              </button>
-            </div>
-          </form>
-        </div>
+          {/* Pinned Bottom Footer */}
+          <div className="apple-modal-footer">
+            <button 
+              type="button" 
+              className="apple-btn-secondary" 
+              onClick={onClose}
+            >
+              취소
+            </button>
+            <button type="submit" className="apple-btn-primary">
+              {isEditMode ? '수정 내용 저장' : '추억 저장'}
+            </button>
+          </div>
+        </form>
       </div>
     </div>
   );
