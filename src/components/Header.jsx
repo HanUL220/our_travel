@@ -19,14 +19,17 @@ export default function Header({ theme, toggleTheme, onOpenNewPost, startDate = 
     <header className="site-header">
       <div className="header-inner">
         <a href="#" className="brand-logo">
-          <Heart className="brand-icon" size={18} fill="currentColor" />
+          <Heart className="brand-icon" size={17} fill="currentColor" />
           <span>Our Travel</span>
         </a>
 
         <div className="header-actions">
           <div className="dday-badge" title={`우리가 시작한 날: ${startDate}`}>
             <span className="dday-dot" />
-            <span>함께한 지 <strong>{dDayText}</strong></span>
+            <span className="dday-text">
+              <span className="dday-label-desktop">함께한 지 </span>
+              <strong>{dDayText}</strong>
+            </span>
           </div>
 
           <button 
@@ -35,11 +38,11 @@ export default function Header({ theme, toggleTheme, onOpenNewPost, startDate = 
             title={theme === 'dark' ? '라이트 모드로 전환' : '다크 모드로 전환'}
             aria-label="테마 전환"
           >
-            {theme === 'dark' ? <Sun size={17} /> : <Moon size={17} />}
+            {theme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}
           </button>
 
           <button className="apple-btn-primary" onClick={onOpenNewPost}>
-            <Plus size={16} />
+            <Plus size={15} />
             <span>추억 기록</span>
           </button>
         </div>
