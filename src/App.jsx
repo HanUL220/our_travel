@@ -5,7 +5,6 @@ import FilterBar from './components/FilterBar';
 import PostCard from './components/PostCard';
 import PostDetailModal from './components/PostDetailModal';
 import PostEditorModal from './components/PostEditorModal';
-import MobileNav from './components/MobileNav';
 import Footer from './components/Footer';
 
 import { initialPosts } from './data/travelPosts';
@@ -177,10 +176,6 @@ export default function App() {
           onSavePost={handleSavePost}
         />
       )}
-
-      <MobileNav 
-        onOpenNewPost={handleOpenCreate}
-      />
 
       <Footer />
     </div>

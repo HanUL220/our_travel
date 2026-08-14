@@ -79,13 +79,7 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   transition: background-color 0.3s ease, color 0.3s ease;
-  padding-bottom: 72px;
-}
-
-@media (min-width: 768px) {
-  body {
-    padding-bottom: 0;
-  }
+  padding-bottom: 0;
 }
 
 a {
@@ -899,6 +893,9 @@ input, textarea, select {
   gap: 0.35rem;
   margin-bottom: 0.9rem;
   width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
 }
 
 .apple-form-label {
@@ -907,8 +904,13 @@ input, textarea, select {
   color: var(--apple-foreground);
 }
 
-.apple-input {
-  width: 100%;
+.apple-input,
+input[type="date"],
+input[type="text"],
+textarea {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
   padding: 9px 12px;
   border-radius: var(--radius-control);
   border: 1px solid var(--apple-border);
@@ -917,7 +919,14 @@ input, textarea, select {
   font-size: 14px;
   outline: none;
   transition: var(--apple-transition);
-  box-sizing: border-box;
+  box-sizing: border-box !important;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+}
+
+input[type="date"]::-webkit-date-and-time-value {
+  text-align: left;
 }
 
 .apple-input:focus {
@@ -927,6 +936,7 @@ input, textarea, select {
 
 .full-width-input {
   width: 100% !important;
+  max-width: 100% !important;
   box-sizing: border-box !important;
 }
 
@@ -938,6 +948,8 @@ input, textarea, select {
   background: rgba(0, 0, 0, 0.05);
   padding: 3px;
   border-radius: var(--radius-control);
+  width: 100%;
+  box-sizing: border-box;
 }
 
 [data-theme='dark'] .apple-segmented-control {
@@ -968,18 +980,28 @@ input, textarea, select {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 0.8rem;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
 }
 
 .apple-grid-3 {
   display: grid;
   grid-template-columns: 1fr 1fr 1.2fr;
   gap: 0.8rem;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
 }
 
 @media (max-width: 640px) {
   .apple-grid-2, .apple-grid-3 {
     grid-template-columns: 1fr;
     gap: 0.75rem;
+    width: 100%;
+    max-width: 100%;
   }
 }
 
@@ -1066,6 +1088,8 @@ input, textarea, select {
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .apple-block-card {
@@ -1074,6 +1098,8 @@ input, textarea, select {
   border-radius: var(--radius-control);
   padding: 0.85rem 1rem;
   transition: var(--apple-transition);
+  width: 100%;
+  box-sizing: border-box;
 }
 
 @media (max-width: 640px) {
@@ -1141,13 +1167,15 @@ input, textarea, select {
 
 .apple-block-card-body {
   width: 100%;
+  box-sizing: border-box;
 }
 
 .apple-day-input-grid {
   display: grid;
-  grid-template-columns: 1fr auto;
+  grid-template-columns: 1fr 1fr;
   gap: 0.6rem;
   width: 100%;
+  box-sizing: border-box;
 }
 
 @media (max-width: 640px) {
@@ -1158,7 +1186,8 @@ input, textarea, select {
 }
 
 .apple-date-input {
-  min-width: 140px;
+  width: 100% !important;
+  max-width: 100% !important;
 }
 
 .apple-heading-input {
@@ -1208,7 +1237,7 @@ input, textarea, select {
 }
 
 /* ==========================================================================
-   Apple Footer & Mobile Nav
+   Apple Footer
    ========================================================================== */
 .apple-footer {
   border-top: 1px solid var(--apple-border);
@@ -1236,46 +1265,4 @@ input, textarea, select {
   font-size: 11px;
   color: var(--apple-muted);
   opacity: 0.8;
-}
-
-.apple-mobile-nav {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 60px;
-  background: var(--apple-glass-bg);
-  backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
-  border-top: 1px solid var(--apple-border);
-  display: flex;
-  align-items: center;
-  justify-content: space-around;
-  z-index: 1000;
-}
-
-@media (min-width: 768px) {
-  .apple-mobile-nav {
-    display: none;
-  }
-}
-
-.apple-nav-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.2rem;
-  color: var(--apple-muted);
-  font-size: 11px;
-  font-weight: 500;
-  transition: var(--apple-transition);
-}
-
-.apple-nav-item.active {
-  color: var(--apple-primary);
-  font-weight: 600;
-}
-
-.apple-nav-add {
-  color: var(--apple-primary);
 }

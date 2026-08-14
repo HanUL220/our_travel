@@ -6,7 +6,7 @@ export default function HeroSection({ totalPosts, totalPhotos }) {
     <section className="apple-hero-section">
       <div className="hero-content">
         <h1 className="hero-headline hero-headline-caps">
-          OUR COUPLE TRAVEL JOURNAL
+          OUR TRAVEL DIARY
         </h1>
         
         <div className="hero-stats-group">
