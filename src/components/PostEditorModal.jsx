@@ -2,17 +2,6 @@ import React, { useState } from 'react';
 import { X, ArrowUp, ArrowDown, Trash2, Image as ImageIcon, Type, Heading, Calendar, CalendarDays, MapPin } from 'lucide-react';
 import ImageUploader from './ImageUploader';
 
-const PLACE_CATEGORIES = [
-  '🏖️ 관광지',
-  '🍽️ 맛집',
-  '☕ 카페',
-  '🏨 숙소',
-  '🌳 산책/자연',
-  '🎡 액티비티',
-  '🛍️ 쇼핑',
-  '📍 기타'
-];
-
 export default function PostEditorModal({ onClose, onSavePost, postToEdit = null }) {
   const isEditMode = Boolean(postToEdit);
 
@@ -80,9 +69,6 @@ export default function PostEditorModal({ onClose, onSavePost, postToEdit = null
       newBlock.content = '';
     } else if (type === 'place') {
       newBlock.placeName = '';
-      newBlock.category = '🏖️ 관광지';
-      newBlock.memo = '';
-      newBlock.address = '';
     } else if (type === 'image') {
       newBlock.url = '';
       newBlock.caption = '';
@@ -400,58 +386,13 @@ export default function PostEditorModal({ onClose, onSavePost, postToEdit = null
 
                       {block.type === 'place' && (
                         <div className="apple-place-block-editor">
-                          <div>
-                            <label className="apple-block-sublabel">장소 이름 *</label>
-                            <input 
-                              type="text" 
-                              className="apple-input full-width-input" 
-                              placeholder="예: 섭지코지, 런던베이글뮤지엄 제주, 협재해수욕장"
-                              value={block.placeName || ''}
-                              onChange={(e) => updateBlock(block.id, 'placeName', e.target.value)}
-                            />
-                          </div>
-
-                          <div>
-                            <label className="apple-block-sublabel">카테고리</label>
-                            <div className="apple-category-chips">
-                              {PLACE_CATEGORIES.map(cat => (
-                                <button
-                                  key={cat}
-                                  type="button"
-                                  className={`apple-cat-chip ${(block.category || '🏖️ 관광지') === cat ? 'active' : ''}`}
-                                  onClick={() => updateBlock(block.id, 'category', cat)}
-                                >
-                                  {cat}
-                                </button>
-                              ))}
-                            </div>
-                          </div>
-
-                          <div>
-                            <label className="apple-block-sublabel">장소 메모 / 후기 (선택)</label>
-                            <textarea 
-                              ref={(el) => autoGrowTextarea(el)}
-                              className="apple-input full-width-input apple-textarea" 
-                              placeholder="어떤 점이 좋았는지, 먹었던 메뉴나 꿀팁을 적어보세요..."
-                              value={block.memo || ''}
-                              onChange={(e) => {
-                                updateBlock(block.id, 'memo', e.target.value);
-                                autoGrowTextarea(e.target);
-                              }}
-                              style={{ minHeight: '60px' }}
-                            />
-                          </div>
-
-                          <div>
-                            <label className="apple-block-sublabel">주소 또는 세부 위치 (선택)</label>
-                            <input 
-                              type="text" 
-                              className="apple-input full-width-input" 
-                              placeholder="예: 제주 서귀포시 성산읍 고성리"
-                              value={block.address || ''}
-                              onChange={(e) => updateBlock(block.id, 'address', e.target.value)}
-                            />
-                          </div>
+                          <input 
+                            type="text" 
+                            className="apple-input full-width-input" 
+                            placeholder="방문한 장소명 (예: 협재해수욕장, 런던베이글뮤지엄, 성산일출봉)"
+                            value={block.placeName || ''}
+                            onChange={(e) => updateBlock(block.id, 'placeName', e.target.value)}
+                          />
                         </div>
                       )}
 

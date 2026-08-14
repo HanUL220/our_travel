@@ -105,64 +105,40 @@ export default function PostDetailModal({ post, onClose, onEditPost, onDeletePos
                       </div>
                     );
                   case 'place': {
-                    const mapSearchKeyword = (block.address || block.placeName || '').trim();
-                    const kakaoMapUrl = mapSearchKeyword 
-                      ? `https://map.kakao.com/link/search/${encodeURIComponent(mapSearchKeyword)}` 
-                      : '';
-                    const naverMapUrl = mapSearchKeyword 
-                      ? `https://map.naver.com/v5/search/${encodeURIComponent(mapSearchKeyword)}` 
-                      : '';
+                    if (!block.placeName || !block.placeName.trim()) return null;
+                    const placeName = block.placeName.trim();
+                    const kakaoMapUrl = `https://map.kakao.com/link/search/${encodeURIComponent(placeName)}`;
+                    const naverMapUrl = `https://map.naver.com/v5/search/${encodeURIComponent(placeName)}`;
 
                     return (
-                      <div key={block.id || idx} className="apple-spot-card">
-                        <div className="apple-spot-card-top">
-                          <div className="apple-spot-badge-wrap">
-                            <span className="apple-spot-cat-badge">{block.category || '🏖️ 관광지'}</span>
-                            <h4 className="apple-spot-name">{block.placeName || '방문 장소'}</h4>
-                          </div>
-
-                          {mapSearchKeyword && (
-                            <div className="apple-spot-map-links">
-                              {kakaoMapUrl && (
-                                <a 
-                                  href={kakaoMapUrl} 
-                                  target="_blank" 
-                                  rel="noopener noreferrer" 
-                                  className="apple-map-link-btn"
-                                  title="카카오맵에서 위치 보기"
-                                >
-                                  <span>카카오맵</span>
-                                  <ExternalLink size={11} />
-                                </a>
-                              )}
-                              {naverMapUrl && (
-                                <a 
-                                  href={naverMapUrl} 
-                                  target="_blank" 
-                                  rel="noopener noreferrer" 
-                                  className="apple-map-link-btn"
-                                  title="네이버 지도에서 위치 보기"
-                                >
-                                  <span>네이버 지도</span>
-                                  <ExternalLink size={11} />
-                                </a>
-                              )}
-                            </div>
-                          )}
+                      <div key={block.id || idx} className="apple-spot-badge-card">
+                        <div className="apple-spot-main-info">
+                          <MapPin size={16} className="apple-spot-icon" />
+                          <span className="apple-spot-name">{placeName}</span>
                         </div>
 
-                        {block.memo && (
-                          <div className="apple-spot-memo">
-                            <p>{block.memo}</p>
-                          </div>
-                        )}
-
-                        {block.address && (
-                          <div className="apple-spot-address">
-                            <MapPin size={12} className="meta-icon" />
-                            <span>{block.address}</span>
-                          </div>
-                        )}
+                        <div className="apple-spot-map-links">
+                          <a 
+                            href={kakaoMapUrl} 
+                            target="_blank" 
+                            rel="noopener noreferrer" 
+                            className="apple-map-link-btn"
+                            title="카카오맵에서 위치 보기"
+                          >
+                            <span>카카오맵</span>
+                            <ExternalLink size={11} />
+                          </a>
+                          <a 
+                            href={naverMapUrl} 
+                            target="_blank" 
+                            rel="noopener noreferrer" 
+                            className="apple-map-link-btn"
+                            title="네이버 지도에서 위치 보기"
+                          >
+                            <span>네이버 지도</span>
+                            <ExternalLink size={11} />
+                          </a>
+                        </div>
                       </div>
                     );
                   }
