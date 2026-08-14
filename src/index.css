@@ -69,6 +69,11 @@
   box-sizing: border-box;
 }
 
+html, body {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
 body {
   font-family: var(--font-family-system);
   background-color: var(--apple-canvas);
@@ -97,6 +102,7 @@ button {
 
 input, textarea, select {
   font-family: inherit;
+  font-size: 16px; /* Essential to prevent iOS Safari automatic zoom-in on focus */
 }
 
 .app-container {
@@ -405,11 +411,11 @@ input, textarea, select {
 .apple-search-input,
 input.apple-search-input {
   width: 100% !important;
-  padding: 11px 40px 11px 44px !important;
+  padding: 10px 40px 10px 44px !important;
   background: var(--apple-surface);
   border: 1px solid var(--apple-border);
   border-radius: var(--radius-pill);
-  font-size: 14px;
+  font-size: 16px; /* 16px prevents iOS Safari auto-zoom */
   color: var(--apple-foreground);
   outline: none;
   box-shadow: var(--shadow-subtle);
@@ -546,6 +552,32 @@ input.apple-search-input {
   color: var(--apple-foreground);
   letter-spacing: -0.018em;
   margin-top: 0.2rem;
+}
+
+.card-spots-summary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin-top: 0.65rem;
+  padding: 4px 10px;
+  background: var(--apple-canvas);
+  border: 1px solid var(--apple-border);
+  border-radius: var(--radius-pill);
+  font-size: 11.5px;
+  color: var(--apple-secondary);
+  max-width: fit-content;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.card-spots-summary .spot-dot {
+  font-size: 11px;
+}
+
+.card-spots-summary .spot-text {
+  font-weight: 500;
+  color: var(--apple-foreground);
 }
 
 /* ==========================================================================
@@ -841,6 +873,109 @@ input.apple-search-input {
   color: var(--apple-muted);
 }
 
+/* Spot / Place Block in Detail Modal */
+.apple-spot-card {
+  background: var(--apple-canvas);
+  border: 1px solid var(--apple-border);
+  border-radius: var(--radius-card);
+  padding: 1.1rem 1.25rem;
+  margin: 1.1rem 0;
+  transition: var(--apple-transition);
+}
+
+.apple-spot-card:hover {
+  border-color: var(--apple-border-strong);
+}
+
+.apple-spot-card-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.8rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.6rem;
+}
+
+.apple-spot-badge-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.apple-spot-cat-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 3px 9px;
+  border-radius: var(--radius-pill);
+  background: var(--apple-surface);
+  border: 1px solid var(--apple-border);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--apple-foreground);
+  box-shadow: var(--shadow-subtle);
+}
+
+.apple-spot-name {
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--apple-foreground);
+  letter-spacing: -0.015em;
+  margin: 0;
+}
+
+.apple-spot-map-links {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.apple-map-link-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 4px 9px;
+  border-radius: var(--radius-pill);
+  background: var(--apple-surface);
+  border: 1px solid var(--apple-border);
+  font-size: 11.5px;
+  font-weight: 500;
+  color: var(--apple-link);
+  transition: var(--apple-transition);
+}
+
+.apple-map-link-btn:hover {
+  border-color: var(--apple-primary);
+  background: rgba(0, 113, 227, 0.06);
+  transform: translateY(-1px);
+}
+
+.apple-spot-memo {
+  font-size: 14.5px;
+  color: var(--apple-foreground);
+  line-height: 1.55;
+  margin-top: 0.4rem;
+  margin-bottom: 0.4rem;
+}
+
+.apple-spot-memo p {
+  margin: 0;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.apple-spot-address {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 12.5px;
+  color: var(--apple-muted);
+  margin-top: 0.5rem;
+  padding-top: 0.45rem;
+  border-top: 1px dashed var(--apple-border);
+}
+
 /* ==========================================================================
    Apple Editor Styles
    ========================================================================== */
@@ -908,10 +1043,23 @@ input.apple-search-input {
   color: var(--apple-foreground);
 }
 
+.apple-block-sublabel {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--apple-muted);
+  margin-bottom: 0.25rem;
+  display: block;
+}
+
 .apple-input,
+.input-field,
 input[type="date"],
 input[type="text"],
-textarea {
+input[type="search"],
+input[type="url"],
+input[type="email"],
+textarea,
+select {
   width: 100% !important;
   max-width: 100% !important;
   min-width: 0 !important;
@@ -920,7 +1068,7 @@ textarea {
   border: 1px solid var(--apple-border);
   background: var(--apple-surface);
   color: var(--apple-foreground);
-  font-size: 14px;
+  font-size: 16px; /* 16px is required to stop iOS Safari automatic zoom on focus */
   outline: none;
   transition: var(--apple-transition);
   box-sizing: border-box !important;
@@ -933,9 +1081,55 @@ input[type="date"]::-webkit-date-and-time-value {
   text-align: left;
 }
 
-.apple-input:focus {
+.apple-input:focus,
+input[type="date"]:focus,
+input[type="text"]:focus,
+textarea:focus {
   border-color: var(--apple-primary);
   box-shadow: 0 0 0 3px rgba(0, 113, 227, 0.15);
+}
+
+/* Category chips for place blocks */
+.apple-place-block-editor {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  width: 100%;
+}
+
+.apple-category-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-top: 0.15rem;
+}
+
+.apple-cat-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 5px 10px;
+  border-radius: var(--radius-pill);
+  background: var(--apple-canvas);
+  border: 1px solid var(--apple-border);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--apple-secondary);
+  cursor: pointer;
+  transition: var(--apple-transition);
+}
+
+.apple-cat-chip:hover {
+  background: var(--apple-surface);
+  color: var(--apple-foreground);
+  border-color: var(--apple-border-strong);
+}
+
+.apple-cat-chip.active {
+  background: var(--apple-primary);
+  color: #ffffff;
+  border-color: var(--apple-primary);
+  box-shadow: 0 1px 3px rgba(0, 113, 227, 0.3);
 }
 
 .full-width-input {

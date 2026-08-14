@@ -8,6 +8,11 @@ export default function PostCard({ post, onSelectPost }) {
   const isMultiDay = post.tripType === 'multi' || post.date?.includes(' ~ ');
   const formattedDate = formatDisplayDate(post.date);
 
+  const placeBlocks = (post.blocks && Array.isArray(post.blocks)) 
+    ? post.blocks.filter(b => b.type === 'place' && b.placeName && b.placeName.trim()) 
+    : [];
+  const spotNames = placeBlocks.map(b => b.placeName.trim());
+
   return (
     <article className="post-card" onClick={() => onSelectPost(post)}>
       <div className="card-image-wrap">
@@ -38,6 +43,16 @@ export default function PostCard({ post, onSelectPost }) {
         </div>
 
         <h3 className="card-title">{post.title}</h3>
+
+        {spotNames.length > 0 && (
+          <div className="card-spots-summary" title={spotNames.join(', ')}>
+            <span className="spot-dot">📍</span>
+            <span className="spot-text">
+              {spotNames.slice(0, 2).join(' · ')}
+              {spotNames.length > 2 && ` 외 ${spotNames.length - 2}곳`}
+            </span>
+          </div>
+        )}
       </div>
     </article>
   );

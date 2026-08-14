@@ -155,6 +155,10 @@ export default function App() {
         if (b.caption && b.caption.toLowerCase().includes(q)) return true;
         if (b.dayTitle && b.dayTitle.toLowerCase().includes(q)) return true;
         if (b.dayDate && b.dayDate.includes(q)) return true;
+        if (b.placeName && b.placeName.toLowerCase().includes(q)) return true;
+        if (b.category && b.category.toLowerCase().includes(q)) return true;
+        if (b.memo && b.memo.toLowerCase().includes(q)) return true;
+        if (b.address && b.address.toLowerCase().includes(q)) return true;
         return false;
       });
     }
