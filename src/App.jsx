@@ -20,7 +20,17 @@ export default function App() {
   // Posts state with LocalStorage persistence & Supabase fallback
   const [posts, setPosts] = useState(() => {
     const saved = localStorage.getItem('our_travel_posts');
-    return saved ? JSON.parse(saved) : initialPosts;
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        // Clean out legacy example posts (id 1, 2, 3) if present
+        const cleaned = parsed.filter(p => p.id !== 1 && p.id !== 2 && p.id !== 3);
+        return cleaned;
+      } catch {
+        return [];
+      }
+    }
+    return [];
   });
 
   const [isLoading, setIsLoading] = useState(isSupabaseConfigured);
@@ -45,15 +55,9 @@ export default function App() {
       try {
         const cloudPosts = await fetchPostsFromSupabase();
         if (cloudPosts && Array.isArray(cloudPosts)) {
-          if (cloudPosts.length > 0) {
-            setPosts(cloudPosts);
-          } else {
-            // If Supabase table is brand new & empty, seed with initialPosts to Supabase
-            setPosts(initialPosts);
-            for (const post of initialPosts) {
-              await savePostToSupabase(post).catch(() => {});
-            }
-          }
+          // Clean out legacy example posts (id 1, 2, 3)
+          const cleaned = cloudPosts.filter(p => String(p.id) !== '1' && String(p.id) !== '2' && String(p.id) !== '3');
+          setPosts(cleaned);
         }
       } catch (err) {
         console.warn('Could not load posts from Supabase, using local data:', err);
@@ -197,10 +201,28 @@ export default function App() {
               />
             ))}
           </div>
+        ) : posts.length === 0 ? (
+          <div style={{ textAlign: 'center', padding: '4.5rem 1.5rem', color: 'var(--text-light)', background: 'var(--apple-canvas)', borderRadius: 'var(--radius-card)', margin: '1rem 0' }}>
+            <div style={{ fontSize: '2.5rem', marginBottom: '0.8rem' }}>✈️</div>
+            <h3 style={{ fontSize: '1.25rem', fontWeight: '600', marginBottom: '0.5rem', color: 'var(--apple-foreground)' }}>
+              아직 등록된 여행 기록이 없어요
+            </h3>
+            <p style={{ fontSize: '0.92rem', color: 'var(--apple-muted)', marginBottom: '1.5rem', lineHeight: '1.5' }}>
+              둘만의 소중한 여행 사진과 이야기를 첫 번째 기록으로 남겨보세요!
+            </p>
+            <button 
+              type="button" 
+              className="apple-header-cta" 
+              onClick={handleOpenCreate}
+              style={{ margin: '0 auto', display: 'inline-flex' }}
+            >
+              + 첫 번째 추억 추가하기
+            </button>
+          </div>
         ) : (
-          <div style={{ textAlign: 'center', padding: '4rem 1rem', color: 'var(--text-light)' }}>
-            <Frown size={48} style={{ marginBottom: '1rem', opacity: 0.6 }} />
-            <h3 style={{ fontSize: '1.2rem', marginBottom: '0.5rem', color: 'var(--text-main)' }}>
+          <div style={{ textAlign: 'center', padding: '4rem 1rem', color: 'var(--apple-muted)' }}>
+            <Frown size={42} style={{ marginBottom: '1rem', opacity: 0.6 }} />
+            <h3 style={{ fontSize: '1.15rem', marginBottom: '0.5rem', color: 'var(--apple-foreground)' }}>
               검색된 여행 추억이 없어요
             </h3>
             <p style={{ fontSize: '0.9rem' }}>
