@@ -2,6 +2,7 @@ import React from 'react';
 import { X, MapPin, Calendar, CalendarDays, Edit2, Trash2, Image as ImageIcon, ExternalLink } from 'lucide-react';
 import { formatImageUrl } from '../utils/imageUtils';
 import { formatDisplayDate } from '../utils/dateUtils';
+import PlaceRouteTimeline from './PlaceRouteTimeline';
 
 export default function PostDetailModal({ post, onClose, onEditPost, onDeletePost }) {
   if (!post) return null;
@@ -16,6 +17,11 @@ export default function PostDetailModal({ post, onClose, onEditPost, onDeletePos
   const hasBlocks = post.blocks && Array.isArray(post.blocks) && post.blocks.length > 0;
   const isMultiDay = post.tripType === 'multi' || (post.startDate && post.endDate && post.startDate !== post.endDate) || post.date?.includes(' ~ ');
   const displayDateText = formatDisplayDate(post.date || post.startDate || '');
+
+  // Extract all place blocks in sequential order
+  const placeBlocks = hasBlocks 
+    ? post.blocks.filter(b => b.type === 'place' && b.placeName && b.placeName.trim()) 
+    : [];
 
   return (
     <div className="modal-overlay" onClick={onClose}>
@@ -77,6 +83,14 @@ export default function PostDetailModal({ post, onClose, onEditPost, onDeletePos
             </div>
           )}
 
+          {/* Real Place Map & Timeline Route (positioned directly below cover photo) */}
+          {placeBlocks.length > 0 && (
+            <PlaceRouteTimeline 
+              places={placeBlocks} 
+              regionHint={post.location} 
+            />
+          )}
+
           {/* Content Blocks */}
           <article className="apple-blog-content">
             {hasBlocks ? (
@@ -107,27 +121,17 @@ export default function PostDetailModal({ post, onClose, onEditPost, onDeletePos
                   case 'place': {
                     if (!block.placeName || !block.placeName.trim()) return null;
                     const placeName = block.placeName.trim();
-                    const kakaoMapUrl = `https://map.kakao.com/link/search/${encodeURIComponent(placeName)}`;
+                    const placeIndex = placeBlocks.findIndex(p => p.id === block.id) + 1;
                     const naverMapUrl = `https://map.naver.com/v5/search/${encodeURIComponent(placeName)}`;
 
                     return (
                       <div key={block.id || idx} className="apple-spot-badge-card">
                         <div className="apple-spot-main-info">
-                          <MapPin size={16} className="apple-spot-icon" />
+                          <div className="apple-spot-number-badge">{placeIndex > 0 ? placeIndex : 1}</div>
                           <span className="apple-spot-name">{placeName}</span>
                         </div>
 
                         <div className="apple-spot-map-links">
-                          <a 
-                            href={kakaoMapUrl} 
-                            target="_blank" 
-                            rel="noopener noreferrer" 
-                            className="apple-map-link-btn"
-                            title="카카오맵에서 위치 보기"
-                          >
-                            <span>카카오맵</span>
-                            <ExternalLink size={11} />
-                          </a>
                           <a 
                             href={naverMapUrl} 
                             target="_blank" 

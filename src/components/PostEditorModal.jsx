@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { X, ArrowUp, ArrowDown, Trash2, Image as ImageIcon, Type, Heading, Calendar, CalendarDays, MapPin } from 'lucide-react';
+import { X, ArrowUp, ArrowDown, Trash2, Image as ImageIcon, Type, Heading, Calendar, CalendarDays, MapPin, Search } from 'lucide-react';
 import ImageUploader from './ImageUploader';
+import { geocodePlace } from '../utils/geoUtils';
 
 export default function PostEditorModal({ onClose, onSavePost, postToEdit = null }) {
   const isEditMode = Boolean(postToEdit);
@@ -16,7 +17,7 @@ export default function PostEditorModal({ onClose, onSavePost, postToEdit = null
   const [location, setLocation] = useState(postToEdit?.location || '');
   const [mainImage, setMainImage] = useState(postToEdit?.mainImage || '');
 
-  // Initialize Blocks state
+  // Initialize Blocks state (starts empty for new posts so user can choose freely)
   const [blocks, setBlocks] = useState(() => {
     if (postToEdit?.blocks && Array.isArray(postToEdit.blocks) && postToEdit.blocks.length > 0) {
       return postToEdit.blocks.filter(b => b.type !== 'tip');
@@ -27,11 +28,7 @@ export default function PostEditorModal({ onClose, onSavePost, postToEdit = null
         { id: 'init-text', type: 'text', content: postToEdit.content }
       ];
     }
-    return [
-      { id: 'b-default-day', type: 'day', dayTitle: '1일차', dayDate: new Date().toISOString().split('T')[0] },
-      { id: 'b-default-heading', type: 'heading', content: '설레는 여행의 시작' },
-      { id: 'b-default-text', type: 'text', content: '' }
-    ];
+    return [];
   });
 
   const calculateNights = (start, end) => {
@@ -100,11 +97,43 @@ export default function PostEditorModal({ onClose, onSavePost, postToEdit = null
   };
 
   const removeBlock = (id) => {
-    if (blocks.length <= 1) {
-      alert('최소 1개 이상의 본문 블록이 필요합니다.');
-      return;
-    }
     setBlocks(prev => prev.filter(b => b.id !== id));
+  };
+
+  const handleOpenSearchForBlock = (blockId) => {
+    const openPostcode = () => {
+      new window.daum.Postcode({
+        oncomplete: async (data) => {
+          const selectedPlace = data.buildingName ? data.buildingName : (data.roadAddress || data.address);
+          const roadAddr = data.roadAddress || data.address;
+          
+          // Geocode the exact road address for 100% accurate coordinates
+          const coords = await geocodePlace(roadAddr, location);
+          
+          setBlocks(prev => prev.map(b => {
+            if (b.id === blockId) {
+              return {
+                ...b,
+                placeName: selectedPlace,
+                address: roadAddr,
+                lat: coords?.lat || null,
+                lng: coords?.lng || null
+              };
+            }
+            return b;
+          }));
+        }
+      }).open();
+    };
+
+    if (window.daum && window.daum.Postcode) {
+      openPostcode();
+    } else {
+      const script = document.createElement('script');
+      script.src = '//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js';
+      script.onload = openPostcode;
+      document.head.appendChild(script);
+    }
   };
 
   const handleSubmit = (e) => {
@@ -322,17 +351,31 @@ export default function PostEditorModal({ onClose, onSavePost, postToEdit = null
               </div>
 
               {/* Blocks List */}
-              <div className="apple-blocks-list">
-                {blocks.map((block, idx) => (
-                  <div key={block.id} className="apple-block-card">
-                    <div className="apple-block-card-header">
-                      <span className="apple-block-type-pill">
-                        {block.type === 'day' && <><CalendarDays size={12} /> 일정 구분</>}
-                        {block.type === 'place' && <><MapPin size={12} /> 장소 / 스팟</>}
-                        {block.type === 'heading' && <><Heading size={12} /> 소제목</>}
-                        {block.type === 'text' && <><Type size={12} /> 본문 글</>}
-                        {block.type === 'image' && <><ImageIcon size={12} /> 사진</>}
-                      </span>
+              {blocks.length === 0 ? (
+                <div className="apple-empty-blocks-guide">
+                  <div className="apple-empty-guide-icon">✨</div>
+                  <p className="apple-empty-guide-title">본문 블록이 아직 비어있습니다</p>
+                  <p className="apple-empty-guide-sub">
+                    위의 <strong>[일정/날짜]</strong>, <strong>[장소/스팟]</strong>, <strong>[소제목]</strong>, <strong>[글 쓰기]</strong>, <strong>[사진 추가]</strong> 버튼을 눌러 원하는 순서대로 자유롭게 추억을 채워보세요!
+                  </p>
+                </div>
+              ) : (
+                <div className="apple-blocks-list">
+                  {blocks.map((block, idx) => {
+                    const placeIndex = block.type === 'place' 
+                      ? blocks.slice(0, idx + 1).filter(b => b.type === 'place').length 
+                      : null;
+
+                    return (
+                      <div key={block.id} className="apple-block-card">
+                        <div className="apple-block-card-header">
+                          <span className="apple-block-type-pill">
+                            {block.type === 'day' && <><CalendarDays size={12} /> 일정 구분</>}
+                            {block.type === 'place' && <><MapPin size={12} /> 장소 #{placeIndex}</>}
+                            {block.type === 'heading' && <><Heading size={12} /> 소제목</>}
+                            {block.type === 'text' && <><Type size={12} /> 본문 글</>}
+                            {block.type === 'image' && <><ImageIcon size={12} /> 사진</>}
+                          </span>
 
                       <div className="apple-block-controls">
                         <button 
@@ -386,13 +429,30 @@ export default function PostEditorModal({ onClose, onSavePost, postToEdit = null
 
                       {block.type === 'place' && (
                         <div className="apple-place-block-editor">
-                          <input 
-                            type="text" 
-                            className="apple-input full-width-input" 
-                            placeholder="방문한 장소명 (예: 협재해수욕장, 런던베이글뮤지엄, 성산일출봉)"
-                            value={block.placeName || ''}
-                            onChange={(e) => updateBlock(block.id, 'placeName', e.target.value)}
-                          />
+                          <div className="apple-place-input-row">
+                            <input 
+                              type="text" 
+                              className="apple-input full-width-input" 
+                              placeholder="방문한 장소명 (예: 협재해수욕장, 런던베이글뮤지엄)"
+                              value={block.placeName || ''}
+                              onChange={(e) => updateBlock(block.id, 'placeName', e.target.value)}
+                            />
+                            <button 
+                              type="button" 
+                              className="apple-search-spot-btn"
+                              onClick={() => handleOpenSearchForBlock(block.id)}
+                              title="장소명 / 주소 검색으로 100% 정확한 좌표 설정"
+                            >
+                              <Search size={13} />
+                              <span>주소/위치 검색</span>
+                            </button>
+                          </div>
+                          {block.lat && block.lng && (
+                            <div className="apple-spot-confirmed-badge">
+                              <MapPin size={12} />
+                              <span>정확한 지도 좌표 설정됨 ({block.lat.toFixed(4)}, {block.lng.toFixed(4)})</span>
+                            </div>
+                          )}
                         </div>
                       )}
 
@@ -438,10 +498,12 @@ export default function PostEditorModal({ onClose, onSavePost, postToEdit = null
                       )}
                     </div>
                   </div>
-                ))}
-              </div>
+                );
+              })}
             </div>
-          </div>
+          )}
+        </div>
+      </div>
 
           {/* Pinned Bottom Footer */}
           <div className="apple-modal-footer">
