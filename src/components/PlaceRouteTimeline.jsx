@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import { Navigation, ExternalLink, Layers, MapPin } from 'lucide-react';
+import { Navigation, ExternalLink, MapPin } from 'lucide-react';
 import { geocodePlaceList } from '../utils/geoUtils';
 
 export default function PlaceRouteTimeline({ places = [], regionHint = '' }) {
@@ -16,7 +16,7 @@ export default function PlaceRouteTimeline({ places = [], regionHint = '' }) {
   const [activeSpotIndex, setActiveSpotIndex] = useState(null);
   const [mapLayerType, setMapLayerType] = useState('roadmap'); // 'roadmap' or 'satellite'
 
-  // 1. Resolve coordinates for all places
+  // 1. Resolve coordinates for all places (preserves saved coordinates strictly)
   useEffect(() => {
     let isMounted = true;
     async function loadCoords() {
@@ -107,6 +107,7 @@ export default function PlaceRouteTimeline({ places = [], regionHint = '' }) {
           <div class="apple-map-popup-header">
             <span class="popup-badge">코스 #${spot.index}</span>
             <strong class="popup-title">${spot.name}</strong>
+            ${spot.address && spot.address !== spot.name ? `<div style="font-size: 11px; color: #777; margin-top: 2px;">📍 ${spot.address}</div>` : ''}
           </div>
           <div class="popup-links">
             <a href="https://map.naver.com/v5/search/${encodeURIComponent(spot.name)}" target="_blank" rel="noopener noreferrer">
@@ -193,7 +194,7 @@ export default function PlaceRouteTimeline({ places = [], regionHint = '' }) {
               여행 코스 & 타임라인
             </h3>
             <p className="apple-route-subtitle">
-              방문한 {resolvedSpots.length || places.length}곳의 여행지를 순서대로 구글 지도에 기록했어요
+              방문한 {resolvedSpots.length || places.length}곳의 여행지를 순서대로 지도에 기록했어요
             </p>
           </div>
         </div>
@@ -205,7 +206,7 @@ export default function PlaceRouteTimeline({ places = [], regionHint = '' }) {
               type="button" 
               className={`apple-map-layer-btn ${mapLayerType === 'roadmap' ? 'active' : ''}`}
               onClick={() => setMapLayerType('roadmap')}
-              title="구글 일반 지도"
+              title="일반 지도"
             >
               일반
             </button>
@@ -213,7 +214,7 @@ export default function PlaceRouteTimeline({ places = [], regionHint = '' }) {
               type="button" 
               className={`apple-map-layer-btn ${mapLayerType === 'satellite' ? 'active' : ''}`}
               onClick={() => setMapLayerType('satellite')}
-              title="구글 위성 지도"
+              title="위성 지도"
             >
               위성
             </button>
@@ -234,7 +235,7 @@ export default function PlaceRouteTimeline({ places = [], regionHint = '' }) {
         {loading && (
           <div className="apple-map-loading-overlay">
             <div className="apple-map-spinner" />
-            <span>장소 좌표를 확인하고 구글 지도를 불러오는 중...</span>
+            <span>장소 좌표를 확인하고 지도를 불러오는 중...</span>
           </div>
         )}
         <div ref={mapContainerRef} className="apple-leaflet-map-root" />
@@ -265,6 +266,13 @@ export default function PlaceRouteTimeline({ places = [], regionHint = '' }) {
                   <span className="apple-timeline-step-order">코스 {spot.index}</span>
                   <h4 className="apple-timeline-step-name">{spot.name}</h4>
                 </div>
+
+                {spot.address && spot.address !== spot.name && (
+                  <div className="apple-timeline-step-address">
+                    <MapPin size={11} />
+                    <span>{spot.address}</span>
+                  </div>
+                )}
 
                 <div className="apple-timeline-step-actions" onClick={(e) => e.stopPropagation()}>
                   <a 

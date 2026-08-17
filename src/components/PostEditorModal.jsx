@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { X, ArrowUp, ArrowDown, Trash2, Image as ImageIcon, Type, Heading, Calendar, CalendarDays, MapPin, Search } from 'lucide-react';
+import { X, ArrowUp, ArrowDown, Trash2, Image as ImageIcon, Heading, Calendar, CalendarDays, MapPin, Search, CheckCircle2 } from 'lucide-react';
 import ImageUploader from './ImageUploader';
-import { geocodePlace } from '../utils/geoUtils';
+import { geocodeKoreanAddress } from '../utils/geoUtils';
 
 export default function PostEditorModal({ onClose, onSavePost, postToEdit = null }) {
   const isEditMode = Boolean(postToEdit);
@@ -17,15 +17,14 @@ export default function PostEditorModal({ onClose, onSavePost, postToEdit = null
   const [location, setLocation] = useState(postToEdit?.location || '');
   const [mainImage, setMainImage] = useState(postToEdit?.mainImage || '');
 
-  // Initialize Blocks state (starts empty for new posts so user can choose freely)
+  // Initialize Blocks state (text block type removed from new additions)
   const [blocks, setBlocks] = useState(() => {
     if (postToEdit?.blocks && Array.isArray(postToEdit.blocks) && postToEdit.blocks.length > 0) {
       return postToEdit.blocks.filter(b => b.type !== 'tip');
     }
     if (postToEdit?.content) {
       return [
-        { id: 'init-day', type: 'day', dayTitle: '1일차', dayDate: postToEdit.startDate || postToEdit.date || '' },
-        { id: 'init-text', type: 'text', content: postToEdit.content }
+        { id: 'init-day', type: 'day', dayTitle: '1일차', dayDate: postToEdit.startDate || postToEdit.date || '' }
       ];
     }
     return [];
@@ -45,13 +44,6 @@ export default function PostEditorModal({ onClose, onSavePost, postToEdit = null
     return '';
   };
 
-  const autoGrowTextarea = (el) => {
-    if (el) {
-      el.style.height = 'auto';
-      el.style.height = `${Math.max(el.scrollHeight, 80)}px`;
-    }
-  };
-
   const addBlock = (type) => {
     const newId = `block-${Date.now()}-${Math.random().toString(36).substr(2, 4)}`;
     let newBlock = { id: newId, type };
@@ -62,10 +54,11 @@ export default function PostEditorModal({ onClose, onSavePost, postToEdit = null
       newBlock.dayDate = tripType === 'multi' ? startDate : '';
     } else if (type === 'heading') {
       newBlock.content = '';
-    } else if (type === 'text') {
-      newBlock.content = '';
     } else if (type === 'place') {
       newBlock.placeName = '';
+      newBlock.address = '';
+      newBlock.lat = null;
+      newBlock.lng = null;
     } else if (type === 'image') {
       newBlock.url = '';
       newBlock.caption = '';
@@ -74,6 +67,7 @@ export default function PostEditorModal({ onClose, onSavePost, postToEdit = null
     setBlocks(prev => [...prev, newBlock]);
   };
 
+  // Safe update for fields without altering other fixed coordinates
   const updateBlock = (id, field, value) => {
     setBlocks(prev => prev.map(block => {
       if (block.id === id) {
@@ -100,24 +94,32 @@ export default function PostEditorModal({ onClose, onSavePost, postToEdit = null
     setBlocks(prev => prev.filter(b => b.id !== id));
   };
 
+  // Open Kakao (Daum) Postcode address search popup (Original requested way)
   const handleOpenSearchForBlock = (blockId) => {
     const openPostcode = () => {
       new window.daum.Postcode({
         oncomplete: async (data) => {
           const selectedPlace = data.buildingName ? data.buildingName : (data.roadAddress || data.address);
           const roadAddr = data.roadAddress || data.address;
-          
-          // Geocode the exact road address for 100% accurate coordinates
-          const coords = await geocodePlace(roadAddr, location);
-          
+
+          // Geocode address with postal details (sigungu, bname, roadname) for 100% pinpoint coordinates
+          const coords = await geocodeKoreanAddress(roadAddr, location, {
+            sido: data.sido,
+            sigungu: data.sigungu,
+            bname: data.bname,
+            roadname: data.roadname,
+            buildingName: data.buildingName
+          });
+
           setBlocks(prev => prev.map(b => {
             if (b.id === blockId) {
               return {
                 ...b,
-                placeName: selectedPlace,
+                placeName: b.placeName && b.placeName.trim() ? b.placeName : selectedPlace,
                 address: roadAddr,
-                lat: coords?.lat || null,
-                lng: coords?.lng || null
+                lat: coords?.lat ? parseFloat(coords.lat) : null,
+                lng: coords?.lng ? parseFloat(coords.lng) : null,
+                originalSpotName: selectedPlace
               };
             }
             return b;
@@ -134,6 +136,20 @@ export default function PostEditorModal({ onClose, onSavePost, postToEdit = null
       script.onload = openPostcode;
       document.head.appendChild(script);
     }
+  };
+
+  const handleClearCoords = (blockId) => {
+    setBlocks(prev => prev.map(b => {
+      if (b.id === blockId) {
+        return {
+          ...b,
+          address: '',
+          lat: null,
+          lng: null
+        };
+      }
+      return b;
+    }));
   };
 
   const handleSubmit = (e) => {
@@ -197,7 +213,7 @@ export default function PostEditorModal({ onClose, onSavePost, postToEdit = null
           {/* Scrollable Body */}
           <div className="apple-modal-body">
             <p className="apple-editor-desc">
-              일정(날짜)별 구분과 사진, 글, 소제목을 원하는 순서대로 자유롭게 배치하세요.
+              일정(날짜)별 구분과 사진, 소제목, 방문 장소를 원하는 순서대로 자유롭게 배치하세요.
             </p>
 
             {/* General Info Section */}
@@ -239,7 +255,7 @@ export default function PostEditorModal({ onClose, onSavePost, postToEdit = null
                 </div>
               </div>
 
-              {/* Dates & Location (Stacks cleanly on mobile) */}
+              {/* Dates & Location */}
               {tripType === 'single' ? (
                 <div className="apple-grid-2">
                   <div className="apple-form-group">
@@ -254,11 +270,11 @@ export default function PostEditorModal({ onClose, onSavePost, postToEdit = null
                   </div>
 
                   <div className="apple-form-group">
-                    <label className="apple-form-label">여행지 장소명</label>
+                    <label className="apple-form-label">여행지 지역명</label>
                     <input 
                       type="text" 
                       className="apple-input full-width-input" 
-                      placeholder="예: 강화도 동막해변"
+                      placeholder="예: 제주 서귀포, 강릉, 부산"
                       value={location}
                       onChange={(e) => setLocation(e.target.value)}
                     />
@@ -290,7 +306,7 @@ export default function PostEditorModal({ onClose, onSavePost, postToEdit = null
                     </div>
 
                     <div className="apple-form-group">
-                      <label className="apple-form-label">여행지 장소명</label>
+                      <label className="apple-form-label">여행지 지역명</label>
                       <input 
                         type="text" 
                         className="apple-input full-width-input" 
@@ -331,7 +347,7 @@ export default function PostEditorModal({ onClose, onSavePost, postToEdit = null
                 </span>
               </div>
 
-              {/* Block Action Pills */}
+              {/* Block Action Pills: '글 쓰기' removed as requested */}
               <div className="apple-add-block-bar">
                 <button type="button" className="apple-add-pill" onClick={() => addBlock('day')}>
                   <CalendarDays size={14} /> 일정 / 날짜
@@ -341,9 +357,6 @@ export default function PostEditorModal({ onClose, onSavePost, postToEdit = null
                 </button>
                 <button type="button" className="apple-add-pill" onClick={() => addBlock('heading')}>
                   <Heading size={14} /> 소제목
-                </button>
-                <button type="button" className="apple-add-pill" onClick={() => addBlock('text')}>
-                  <Type size={14} /> 글 쓰기
                 </button>
                 <button type="button" className="apple-add-pill" onClick={() => addBlock('image')}>
                   <ImageIcon size={14} /> 사진 추가
@@ -356,7 +369,7 @@ export default function PostEditorModal({ onClose, onSavePost, postToEdit = null
                   <div className="apple-empty-guide-icon">✨</div>
                   <p className="apple-empty-guide-title">본문 블록이 아직 비어있습니다</p>
                   <p className="apple-empty-guide-sub">
-                    위의 <strong>[일정/날짜]</strong>, <strong>[장소/스팟]</strong>, <strong>[소제목]</strong>, <strong>[글 쓰기]</strong>, <strong>[사진 추가]</strong> 버튼을 눌러 원하는 순서대로 자유롭게 추억을 채워보세요!
+                    위의 <strong>[일정/날짜]</strong>, <strong>[장소/스팟]</strong>, <strong>[소제목]</strong>, <strong>[사진 추가]</strong> 버튼을 눌러 원하는 순서대로 자유롭게 추억을 채워보세요!
                   </p>
                 </div>
               ) : (
@@ -373,137 +386,166 @@ export default function PostEditorModal({ onClose, onSavePost, postToEdit = null
                             {block.type === 'day' && <><CalendarDays size={12} /> 일정 구분</>}
                             {block.type === 'place' && <><MapPin size={12} /> 장소 #{placeIndex}</>}
                             {block.type === 'heading' && <><Heading size={12} /> 소제목</>}
-                            {block.type === 'text' && <><Type size={12} /> 본문 글</>}
+                            {block.type === 'text' && <>본문 글</>}
                             {block.type === 'image' && <><ImageIcon size={12} /> 사진</>}
                           </span>
 
-                      <div className="apple-block-controls">
-                        <button 
-                          type="button" 
-                          className="apple-ctrl-btn" 
-                          onClick={() => moveBlock(idx, -1)}
-                          disabled={idx === 0}
-                          title="위로 이동"
-                        >
-                          <ArrowUp size={13} />
-                        </button>
-                        <button 
-                          type="button" 
-                          className="apple-ctrl-btn" 
-                          onClick={() => moveBlock(idx, 1)}
-                          disabled={idx === blocks.length - 1}
-                          title="아래로 이동"
-                        >
-                          <ArrowDown size={13} />
-                        </button>
-                        <button 
-                          type="button" 
-                          className="apple-ctrl-btn apple-ctrl-delete" 
-                          onClick={() => removeBlock(block.id)}
-                          title="블록 삭제"
-                        >
-                          <Trash2 size={13} />
-                        </button>
-                      </div>
-                    </div>
-
-                    <div className="apple-block-card-body">
-                      {block.type === 'day' && (
-                        <div className="apple-day-input-grid">
-                          <input 
-                            type="text" 
-                            className="apple-input full-width-input" 
-                            placeholder="구분 제목 (예: 1일차, DAY 1, 또는 6월 25일)"
-                            value={block.dayTitle || ''}
-                            onChange={(e) => updateBlock(block.id, 'dayTitle', e.target.value)}
-                          />
-                          <input 
-                            type="date" 
-                            className="apple-input full-width-input apple-date-input" 
-                            value={block.dayDate || ''}
-                            onChange={(e) => updateBlock(block.id, 'dayDate', e.target.value)}
-                            title="해당 날짜 선택"
-                          />
-                        </div>
-                      )}
-
-                      {block.type === 'place' && (
-                        <div className="apple-place-block-editor">
-                          <div className="apple-place-input-row">
-                            <input 
-                              type="text" 
-                              className="apple-input full-width-input" 
-                              placeholder="방문한 장소명 (예: 협재해수욕장, 런던베이글뮤지엄)"
-                              value={block.placeName || ''}
-                              onChange={(e) => updateBlock(block.id, 'placeName', e.target.value)}
-                            />
+                          <div className="apple-block-controls">
                             <button 
                               type="button" 
-                              className="apple-search-spot-btn"
-                              onClick={() => handleOpenSearchForBlock(block.id)}
-                              title="장소명 / 주소 검색으로 100% 정확한 좌표 설정"
+                              className="apple-ctrl-btn" 
+                              onClick={() => moveBlock(idx, -1)}
+                              disabled={idx === 0}
+                              title="위로 이동"
                             >
-                              <Search size={13} />
-                              <span>주소/위치 검색</span>
+                              <ArrowUp size={13} />
+                            </button>
+                            <button 
+                              type="button" 
+                              className="apple-ctrl-btn" 
+                              onClick={() => moveBlock(idx, 1)}
+                              disabled={idx === blocks.length - 1}
+                              title="아래로 이동"
+                            >
+                              <ArrowDown size={13} />
+                            </button>
+                            <button 
+                              type="button" 
+                              className="apple-ctrl-btn apple-ctrl-delete" 
+                              onClick={() => removeBlock(block.id)}
+                              title="블록 삭제"
+                            >
+                              <Trash2 size={13} />
                             </button>
                           </div>
-                          {block.lat && block.lng && (
-                            <div className="apple-spot-confirmed-badge">
-                              <MapPin size={12} />
-                              <span>정확한 지도 좌표 설정됨 ({block.lat.toFixed(4)}, {block.lng.toFixed(4)})</span>
+                        </div>
+
+                        <div className="apple-block-card-body">
+                          {block.type === 'day' && (
+                            <div className="apple-day-input-grid">
+                              <input 
+                                type="text" 
+                                className="apple-input full-width-input" 
+                                placeholder="구분 제목 (예: 1일차, DAY 1, 또는 6월 25일)"
+                                value={block.dayTitle || ''}
+                                onChange={(e) => updateBlock(block.id, 'dayTitle', e.target.value)}
+                              />
+                              <input 
+                                type="date" 
+                                className="apple-input full-width-input apple-date-input" 
+                                value={block.dayDate || ''}
+                                onChange={(e) => updateBlock(block.id, 'dayDate', e.target.value)}
+                                title="해당 날짜 선택"
+                              />
+                            </div>
+                          )}
+
+                          {block.type === 'place' && (
+                            <div className="apple-place-block-editor">
+                              <div className="apple-place-input-row">
+                                <input 
+                                  type="text" 
+                                  className="apple-input full-width-input" 
+                                  placeholder="본문에 표시될 장소명 (예: 협재해수욕장, 우리 숙소)"
+                                  value={block.placeName || ''}
+                                  onChange={(e) => updateBlock(block.id, 'placeName', e.target.value)}
+                                />
+                                <button 
+                                  type="button" 
+                                  className="apple-search-spot-btn"
+                                  onClick={() => handleOpenSearchForBlock(block.id)}
+                                  title="주소/위치 검색으로 정확한 좌표 설정"
+                                >
+                                  <Search size={13} />
+                                  <span>주소/위치 검색</span>
+                                </button>
+                              </div>
+
+                              {/* Fixed Address and Coordinates Badge (Does NOT change when placeName changes) */}
+                              {block.lat && block.lng ? (
+                                <div className="apple-spot-confirmed-badge naver-confirmed-badge">
+                                  <div className="naver-badge-info">
+                                    <div className="naver-badge-status">
+                                      <CheckCircle2 size={13} className="naver-check-icon" />
+                                      <strong>주소 기준 좌표 고정됨</strong>
+                                    </div>
+                                    <div className="naver-badge-addr">
+                                      📍 {block.address || '주소 등록 완료'} ({Number(block.lat).toFixed(4)}, {Number(block.lng).toFixed(4)})
+                                    </div>
+                                    <div className="naver-badge-hint">
+                                      💡 장소명을 "{block.placeName || '자유 텍스트'}"로 변경하셔도 위 주소 기준 좌표가 안전하게 유지됩니다.
+                                    </div>
+                                  </div>
+                                  <div className="naver-badge-actions">
+                                    <button 
+                                      type="button" 
+                                      className="naver-badge-rechange-btn"
+                                      onClick={() => handleOpenSearchForBlock(block.id)}
+                                    >
+                                      주소 변경
+                                    </button>
+                                    <button 
+                                      type="button" 
+                                      className="naver-badge-clear-btn"
+                                      onClick={() => handleClearCoords(block.id)}
+                                      title="좌표 초기화"
+                                    >
+                                      좌표 해제
+                                    </button>
+                                  </div>
+                                </div>
+                              ) : (
+                                <div className="apple-spot-unconfirmed-guide">
+                                  <span>💡 우측 <strong>[주소/위치 검색]</strong> 버튼을 눌러 주소를 선택하면 해당 주소 기준 좌표가 정확하게 고정됩니다.</span>
+                                </div>
+                              )}
+                            </div>
+                          )}
+
+                          {block.type === 'heading' && (
+                            <input 
+                              type="text" 
+                              className="apple-input full-width-input apple-heading-input" 
+                              placeholder="소제목을 입력하세요"
+                              value={block.content || ''}
+                              onChange={(e) => updateBlock(block.id, 'content', e.target.value)}
+                            />
+                          )}
+
+                          {block.type === 'text' && (
+                            <textarea 
+                              className="apple-input full-width-input apple-textarea" 
+                              placeholder="여행 내용"
+                              value={block.content || ''}
+                              onChange={(e) => updateBlock(block.id, 'content', e.target.value)}
+                            />
+                          )}
+
+                          {block.type === 'image' && (
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem', width: '100%' }}>
+                              <ImageUploader 
+                                value={block.url || ''}
+                                onChange={(newUrl) => updateBlock(block.id, 'url', newUrl)}
+                                placeholder="사진 URL 또는 구글 드라이브 링크를 입력하세요"
+                                compact={true}
+                              />
+                              <input 
+                                type="text" 
+                                className="apple-input full-width-input" 
+                                placeholder="사진 아래에 들어갈 설명 캡션 (선택)"
+                                value={block.caption || ''}
+                                onChange={(e) => updateBlock(block.id, 'caption', e.target.value)}
+                              />
                             </div>
                           )}
                         </div>
-                      )}
-
-                      {block.type === 'heading' && (
-                        <input 
-                          type="text" 
-                          className="apple-input full-width-input apple-heading-input" 
-                          placeholder="소제목을 입력하세요"
-                          value={block.content || ''}
-                          onChange={(e) => updateBlock(block.id, 'content', e.target.value)}
-                        />
-                      )}
-
-                      {block.type === 'text' && (
-                        <textarea 
-                          ref={(el) => autoGrowTextarea(el)}
-                          className="apple-input full-width-input apple-textarea" 
-                          placeholder="여행에서의 감정과 추억을 편안하게 적어보세요..."
-                          value={block.content || ''}
-                          onChange={(e) => {
-                            updateBlock(block.id, 'content', e.target.value);
-                            autoGrowTextarea(e.target);
-                          }}
-                        />
-                      )}
-
-                      {block.type === 'image' && (
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem', width: '100%' }}>
-                          <ImageUploader 
-                            value={block.url || ''}
-                            onChange={(newUrl) => updateBlock(block.id, 'url', newUrl)}
-                            placeholder="사진 URL 또는 구글 드라이브 링크를 입력하세요"
-                            compact={true}
-                          />
-                          <input 
-                            type="text" 
-                            className="apple-input full-width-input" 
-                            placeholder="사진 아래에 들어갈 설명 캡션 (선택)"
-                            value={block.caption || ''}
-                            onChange={(e) => updateBlock(block.id, 'caption', e.target.value)}
-                          />
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                );
-              })}
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
             </div>
-          )}
-        </div>
-      </div>
+          </div>
 
           {/* Pinned Bottom Footer */}
           <div className="apple-modal-footer">

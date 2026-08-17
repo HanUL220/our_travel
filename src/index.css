@@ -2213,25 +2213,692 @@ textarea:focus {
   transform: translateY(-1px);
 }
 
-.apple-spot-confirmed-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  margin-top: 0.35rem;
-  font-size: 11.5px;
-  font-weight: 600;
-  color: #059669;
-  background: #ecfdf5;
-  padding: 3px 8px;
-  border-radius: 6px;
-  border: 1px solid #a7f3d0;
+.naver-spot-btn {
+  background: rgba(3, 199, 90, 0.08);
+  border-color: rgba(3, 199, 90, 0.35);
+  color: #029944;
 }
 
-[data-theme="dark"] .apple-spot-confirmed-badge {
-  background: rgba(5, 150, 105, 0.15);
-  border-color: rgba(5, 150, 105, 0.3);
-  color: #34d399;
+.naver-spot-btn:hover {
+  background: rgba(3, 199, 90, 0.16);
+  border-color: #03c75a;
+  color: #028038;
 }
+
+/* ==========================================================================
+   Naver Map Place Search Modal & Badges
+   ========================================================================== */
+
+.naver-modal-portal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  z-index: 99999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.25rem;
+  animation: appleFadeIn 0.2s ease-out;
+}
+
+.naver-search-modal-card {
+  background: var(--apple-surface);
+  border-radius: var(--radius-modal);
+  width: 92%;
+  max-width: 880px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--apple-border);
+  overflow: hidden;
+  position: relative;
+  z-index: 100000;
+  animation: appleModalPop 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.naver-quick-apply-btn {
+  padding: 3px 9px;
+  border-radius: var(--radius-pill);
+  background: #03c75a;
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  transition: var(--apple-transition);
+}
+
+.naver-quick-apply-btn:hover {
+  background: #02b04f;
+  transform: scale(1.04);
+}
+
+.naver-search-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.1rem 1.4rem;
+  border-bottom: 1px solid var(--apple-border);
+  background: var(--apple-surface);
+}
+
+.naver-brand-title {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.naver-brand-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background: #03c75a;
+  color: #ffffff;
+  font-weight: 900;
+  font-size: 17px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(3, 199, 90, 0.35);
+}
+
+.naver-brand-text h3 {
+  font-size: 1.05rem;
+  font-weight: 700;
+  margin: 0 0 2px 0;
+  color: var(--apple-foreground);
+  letter-spacing: -0.02em;
+}
+
+.naver-brand-text p {
+  font-size: 12px;
+  margin: 0;
+  color: var(--apple-muted);
+}
+
+/* Search input area */
+.naver-search-input-section {
+  padding: 1rem 1.4rem 0.8rem;
+  background: var(--apple-canvas);
+  border-bottom: 1px solid var(--apple-border);
+}
+
+.naver-search-form {
+  display: flex;
+  gap: 0.6rem;
+}
+
+.naver-input-wrap {
+  position: relative;
+  flex: 1;
+  display: flex;
+  align-items: center;
+}
+
+.naver-input-search-icon {
+  position: absolute;
+  left: 12px;
+  color: #03c75a;
+  pointer-events: none;
+}
+
+.naver-search-input {
+  width: 100%;
+  padding: 0.68rem 2.2rem 0.68rem 2.4rem;
+  font-size: 14px;
+  border-radius: var(--radius-pill);
+  border: 1.5px solid var(--apple-border);
+  background: var(--apple-surface);
+  color: var(--apple-foreground);
+  outline: none;
+  transition: var(--apple-transition);
+  font-family: inherit;
+}
+
+.naver-search-input:focus {
+  border-color: #03c75a;
+  box-shadow: 0 0 0 3px rgba(3, 199, 90, 0.18);
+}
+
+.naver-input-clear-btn {
+  position: absolute;
+  right: 10px;
+  background: none;
+  border: none;
+  color: var(--apple-muted);
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+}
+
+.naver-input-clear-btn:hover {
+  color: var(--apple-foreground);
+  background: var(--apple-border);
+}
+
+.naver-search-submit-btn {
+  padding: 0 1.4rem;
+  border-radius: var(--radius-pill);
+  background: #03c75a;
+  color: #ffffff;
+  font-weight: 600;
+  font-size: 13.5px;
+  border: none;
+  cursor: pointer;
+  transition: var(--apple-transition);
+  box-shadow: 0 2px 6px rgba(3, 199, 90, 0.3);
+  white-space: nowrap;
+}
+
+.naver-search-submit-btn:hover:not(:disabled) {
+  background: #02b04f;
+  transform: translateY(-1px);
+}
+
+.naver-search-submit-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Recommend tag pills */
+.naver-tags-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.65rem;
+  overflow-x: auto;
+  padding-bottom: 2px;
+}
+
+.naver-tags-label {
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--apple-muted);
+  flex-shrink: 0;
+}
+
+.naver-tags-list {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  overflow-x: auto;
+  white-space: nowrap;
+}
+
+.naver-tag-pill {
+  font-size: 11.5px;
+  padding: 3px 9px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--apple-border);
+  background: var(--apple-surface);
+  color: var(--apple-foreground);
+  cursor: pointer;
+  transition: var(--apple-transition);
+}
+
+.naver-tag-pill:hover {
+  border-color: #03c75a;
+  color: #029944;
+  background: rgba(3, 199, 90, 0.06);
+}
+
+/* 2-Column Main Grid */
+.naver-search-body-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  flex: 1;
+  min-height: 380px;
+  max-height: 440px;
+  overflow: hidden;
+}
+
+@media (max-width: 768px) {
+  .naver-search-body-grid {
+    grid-template-columns: 1fr;
+    max-height: 60vh;
+    overflow-y: auto;
+  }
+}
+
+/* Left Column: Results */
+.naver-results-pane {
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid var(--apple-border);
+  background: var(--apple-surface);
+  overflow: hidden;
+}
+
+@media (max-width: 768px) {
+  .naver-results-pane {
+    border-right: none;
+    border-bottom: 1px solid var(--apple-border);
+    max-height: 240px;
+  }
+}
+
+.naver-results-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.6rem 1rem;
+  border-bottom: 1px solid var(--apple-border);
+  font-size: 12px;
+  background: var(--apple-surface);
+}
+
+.naver-results-count {
+  color: var(--apple-muted);
+}
+
+.naver-results-count strong {
+  color: #03c75a;
+}
+
+.naver-open-web-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #03c75a;
+  text-decoration: none;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: rgba(3, 199, 90, 0.08);
+  transition: var(--apple-transition);
+}
+
+.naver-open-web-link:hover {
+  background: rgba(3, 199, 90, 0.16);
+  color: #028038;
+}
+
+.naver-results-scroll-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0.6rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.naver-spot-item-card {
+  padding: 0.75rem 0.9rem;
+  border-radius: var(--radius-card);
+  border: 1.5px solid var(--apple-border);
+  background: var(--apple-canvas);
+  cursor: pointer;
+  transition: var(--apple-transition);
+  text-align: left;
+}
+
+.naver-spot-item-card:hover {
+  border-color: rgba(3, 199, 90, 0.5);
+  background: var(--apple-surface);
+  transform: translateY(-1px);
+}
+
+.naver-spot-item-card.is-active {
+  border-color: #03c75a;
+  background: rgba(3, 199, 90, 0.06);
+  box-shadow: 0 2px 8px rgba(3, 199, 90, 0.15);
+}
+
+.naver-spot-item-header {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-bottom: 0.25rem;
+}
+
+.naver-spot-category {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 5px;
+  border-radius: 4px;
+  background: rgba(3, 199, 90, 0.12);
+  color: #029944;
+}
+
+.naver-spot-name {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--apple-foreground);
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+.naver-spot-address {
+  display: flex;
+  align-items: flex-start;
+  gap: 4px;
+  font-size: 12px;
+  color: var(--apple-muted);
+  margin: 0 0 0.35rem 0;
+  line-height: 1.35;
+}
+
+.naver-spot-pin-icon {
+  flex-shrink: 0;
+  margin-top: 2px;
+  color: #03c75a;
+}
+
+.naver-spot-coords-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 11px;
+}
+
+.naver-coords-badge {
+  color: var(--apple-muted);
+  font-family: ui-monospace, SFMono-Regular, monospace;
+}
+
+.naver-selected-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  color: #03c75a;
+  font-weight: 700;
+  font-size: 11.5px;
+}
+
+/* Empty / Loading states */
+.naver-loading-box,
+.naver-empty-results,
+.naver-empty-guide {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2.5rem 1.5rem;
+  text-align: center;
+  color: var(--apple-muted);
+  height: 100%;
+}
+
+.naver-empty-title {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--apple-foreground);
+  margin: 0 0 0.25rem 0;
+}
+
+.naver-empty-desc {
+  font-size: 12px;
+  color: var(--apple-muted);
+  line-height: 1.4;
+  margin: 0;
+}
+
+/* Right Column: Map Pane */
+.naver-map-pane {
+  display: flex;
+  flex-direction: column;
+  background: var(--apple-canvas);
+  position: relative;
+}
+
+.naver-map-pane-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.6rem 1rem;
+  border-bottom: 1px solid var(--apple-border);
+  font-size: 12px;
+  background: var(--apple-surface);
+}
+
+.naver-map-pane-title {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-weight: 600;
+  color: var(--apple-foreground);
+}
+
+.naver-map-coords-pill {
+  font-size: 11px;
+  font-family: ui-monospace, monospace;
+  background: var(--apple-canvas);
+  padding: 2px 7px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--apple-border);
+  color: #03c75a;
+  font-weight: 600;
+}
+
+.naver-map-root {
+  flex: 1;
+  width: 100%;
+  min-height: 280px;
+  z-index: 1;
+}
+
+.naver-map-guide-bar {
+  padding: 0.45rem 0.8rem;
+  font-size: 11px;
+  color: var(--apple-muted);
+  background: var(--apple-surface);
+  border-top: 1px solid var(--apple-border);
+  text-align: center;
+}
+
+/* Naver Custom Marker */
+.naver-custom-marker-wrap {
+  background: none;
+  border: none;
+}
+
+.naver-map-marker-pin {
+  width: 34px;
+  height: 34px;
+  border-radius: 50% 50% 50% 0;
+  background: #03c75a;
+  position: absolute;
+  transform: rotate(-45deg);
+  left: 50%;
+  top: 50%;
+  margin: -17px 0 0 -17px;
+  box-shadow: 0 4px 12px rgba(3, 199, 90, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid #ffffff;
+}
+
+.naver-pin-icon {
+  transform: rotate(45deg);
+  color: #ffffff;
+  font-weight: 900;
+  font-size: 14px;
+  line-height: 1;
+}
+
+/* Modal Footer */
+.naver-search-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.9rem 1.4rem;
+  border-top: 1px solid var(--apple-border);
+  background: var(--apple-surface);
+}
+
+.naver-footer-spot-info {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 13px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.naver-footer-label {
+  color: var(--apple-muted);
+  font-size: 12px;
+}
+
+.naver-footer-name {
+  color: var(--apple-foreground);
+  font-weight: 700;
+}
+
+.naver-footer-addr {
+  color: var(--apple-muted);
+  font-size: 11.5px;
+}
+
+.naver-footer-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-shrink: 0;
+}
+
+.naver-apply-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0.65rem 1.3rem;
+  border-radius: var(--radius-pill);
+  background: #03c75a;
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 13.5px;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(3, 199, 90, 0.35);
+  transition: var(--apple-transition);
+}
+
+.naver-apply-btn:hover:not(:disabled) {
+  background: #02b04f;
+  transform: translateY(-1px);
+}
+
+.naver-apply-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Post Editor Fixed Coordinates Badge */
+.naver-confirmed-badge {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.8rem;
+  margin-top: 0.5rem;
+  padding: 0.6rem 0.85rem;
+  border-radius: var(--radius-card);
+  background: rgba(3, 199, 90, 0.06);
+  border: 1.5px solid rgba(3, 199, 90, 0.35);
+  width: 100%;
+}
+
+.naver-badge-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  text-align: left;
+}
+
+.naver-badge-status {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: #029944;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.naver-check-icon {
+  color: #03c75a;
+}
+
+.naver-badge-addr {
+  font-size: 12px;
+  color: var(--apple-foreground);
+  font-weight: 500;
+}
+
+.naver-badge-hint {
+  font-size: 11px;
+  color: var(--apple-muted);
+  margin-top: 2px;
+  line-height: 1.35;
+}
+
+.naver-badge-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.naver-badge-rechange-btn {
+  padding: 4px 9px;
+  border-radius: var(--radius-pill);
+  background: #03c75a;
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: var(--apple-transition);
+  white-space: nowrap;
+}
+
+.naver-badge-rechange-btn:hover {
+  background: #02b04f;
+}
+
+.naver-badge-clear-btn {
+  padding: 3px 8px;
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: var(--apple-muted);
+  font-size: 11px;
+  border: 1px solid var(--apple-border);
+  cursor: pointer;
+  transition: var(--apple-transition);
+  white-space: nowrap;
+}
+
+.naver-badge-clear-btn:hover {
+  color: #ef4444;
+  border-color: #ef4444;
+}
+
+.apple-spot-unconfirmed-guide {
+  margin-top: 0.35rem;
+  font-size: 11.5px;
+  color: var(--apple-muted);
+  line-height: 1.35;
+}
+
+.apple-timeline-step-address {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 11.5px;
+  color: var(--apple-muted);
+  margin-top: 2px;
+}
+
 
 
 
