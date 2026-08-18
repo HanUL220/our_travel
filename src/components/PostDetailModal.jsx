@@ -122,13 +122,23 @@ export default function PostDetailModal({ post, onClose, onEditPost, onDeletePos
                     if (!block.placeName || !block.placeName.trim()) return null;
                     const placeName = block.placeName.trim();
                     const placeIndex = placeBlocks.findIndex(p => p.id === block.id) + 1;
+                    const googleMapUrl = block.lat && block.lng
+                      ? `https://www.google.com/maps/search/?api=1&query=${block.lat},${block.lng}`
+                      : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(placeName)}`;
                     const naverMapUrl = `https://map.naver.com/v5/search/${encodeURIComponent(placeName)}`;
 
                     return (
                       <div key={block.id || idx} className="apple-spot-badge-card">
                         <div className="apple-spot-main-info">
                           <div className="apple-spot-number-badge">{placeIndex > 0 ? placeIndex : 1}</div>
-                          <span className="apple-spot-name">{placeName}</span>
+                          <div>
+                            <span className="apple-spot-name">{placeName}</span>
+                            {block.address && block.address !== placeName && (
+                              <div style={{ fontSize: '11.5px', color: 'var(--apple-muted)', marginTop: '2px' }}>
+                                📍 {block.address}
+                              </div>
+                            )}
+                          </div>
                         </div>
 
                         <div className="apple-spot-map-links">
@@ -139,6 +149,7 @@ export default function PostDetailModal({ post, onClose, onEditPost, onDeletePos
                             className="apple-map-link-btn"
                             title="네이버 지도에서 위치 보기"
                           >
+                            <span className="naver-n-icon-xs">N</span>
                             <span>네이버 지도</span>
                             <ExternalLink size={11} />
                           </a>

@@ -102,6 +102,9 @@ export default function PlaceRouteTimeline({ places = [], regionHint = '' }) {
         popupAnchor: [0, -32]
       });
 
+      const googleMapUrl = `https://www.google.com/maps/search/?api=1&query=${spot.lat},${spot.lng}`;
+      const naverMapUrl = `https://map.naver.com/v5/search/${encodeURIComponent(spot.name)}`;
+
       const popupHtml = `
         <div class="apple-map-popup">
           <div class="apple-map-popup-header">
@@ -110,7 +113,7 @@ export default function PlaceRouteTimeline({ places = [], regionHint = '' }) {
             ${spot.address && spot.address !== spot.name ? `<div style="font-size: 11px; color: #777; margin-top: 2px;">📍 ${spot.address}</div>` : ''}
           </div>
           <div class="popup-links">
-            <a href="https://map.naver.com/v5/search/${encodeURIComponent(spot.name)}" target="_blank" rel="noopener noreferrer">
+            <a href="${naverMapUrl}" target="_blank" rel="noopener noreferrer">
               네이버 지도에서 보기 ↗
             </a>
           </div>
@@ -194,7 +197,7 @@ export default function PlaceRouteTimeline({ places = [], regionHint = '' }) {
               여행 코스 & 타임라인
             </h3>
             <p className="apple-route-subtitle">
-              방문한 {resolvedSpots.length || places.length}곳의 여행지를 순서대로 지도에 기록했어요
+              방문한 {resolvedSpots.length || places.length}곳의 여행지를 순서대로 Google 지도에 기록했어요
             </p>
           </div>
         </div>
@@ -235,7 +238,7 @@ export default function PlaceRouteTimeline({ places = [], regionHint = '' }) {
         {loading && (
           <div className="apple-map-loading-overlay">
             <div className="apple-map-spinner" />
-            <span>장소 좌표를 확인하고 지도를 불러오는 중...</span>
+            <span>장소 좌표를 확인하고 Google 지도를 불러오는 중...</span>
           </div>
         )}
         <div ref={mapContainerRef} className="apple-leaflet-map-root" />
@@ -245,6 +248,7 @@ export default function PlaceRouteTimeline({ places = [], regionHint = '' }) {
       <div className="apple-route-timeline-stepper">
         {resolvedSpots.map((spot, idx) => {
           const isActive = activeSpotIndex === idx;
+          const googleUrl = `https://www.google.com/maps/search/?api=1&query=${spot.lat},${spot.lng}`;
           const naverUrl = `https://map.naver.com/v5/search/${encodeURIComponent(spot.name)}`;
 
           return (

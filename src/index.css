@@ -2899,6 +2899,782 @@ textarea:focus {
   margin-top: 2px;
 }
 
+/* ==========================================================================
+   Google Maps Place Picker & Interactive Pin Picker Modal Styles
+   ========================================================================== */
+
+.google-picker-overlay {
+  z-index: 1050;
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  background: rgba(0, 0, 0, 0.55);
+}
+
+.google-picker-card {
+  width: 95%;
+  max-width: 980px;
+  max-height: 92vh;
+  border-radius: 22px;
+  background: var(--apple-surface);
+  border: 1px solid var(--apple-border);
+  box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.45);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: appleModalPop 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Header */
+.google-picker-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.1rem 1.4rem;
+  border-bottom: 1px solid var(--apple-border);
+  background: var(--apple-surface);
+}
+
+.google-picker-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.google-brand-icon-box {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  background: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(66, 133, 244, 0.25);
+  border: 1px solid rgba(66, 133, 244, 0.2);
+}
+
+.google-g-letter {
+  font-size: 19px;
+  font-weight: 900;
+  font-family: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: linear-gradient(135deg, #4285f4 0%, #ea4335 33%, #fbbc05 66%, #34a853 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.google-brand-info {
+  text-align: left;
+}
+
+.google-picker-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--apple-foreground);
+  margin: 0 0 2px 0;
+  letter-spacing: -0.02em;
+}
+
+.google-picker-subtitle {
+  font-size: 12px;
+  color: var(--apple-muted);
+  margin: 0;
+}
+
+/* Search Bar Section */
+.google-picker-search-bar-wrap {
+  padding: 0.9rem 1.4rem 0.8rem;
+  background: var(--apple-canvas);
+  border-bottom: 1px solid var(--apple-border);
+}
+
+.google-search-form {
+  display: flex;
+  gap: 0.6rem;
+  align-items: center;
+}
+
+.google-search-input-box {
+  position: relative;
+  flex: 1;
+  display: flex;
+  align-items: center;
+}
+
+.google-search-icon {
+  position: absolute;
+  left: 12px;
+  color: #4285f4;
+  pointer-events: none;
+}
+
+.google-search-input {
+  width: 100%;
+  padding: 0.7rem 2.2rem 0.7rem 2.4rem;
+  font-size: 13.5px;
+  border-radius: var(--radius-pill);
+  border: 1.5px solid var(--apple-border);
+  background: var(--apple-surface);
+  color: var(--apple-foreground);
+  outline: none;
+  transition: var(--apple-transition);
+  font-family: inherit;
+}
+
+.google-search-input:focus {
+  border-color: #4285f4;
+  box-shadow: 0 0 0 3px rgba(66, 133, 244, 0.2);
+}
+
+.google-input-clear-btn {
+  position: absolute;
+  right: 10px;
+  background: none;
+  border: none;
+  color: var(--apple-muted);
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+}
+
+.google-input-clear-btn:hover {
+  color: var(--apple-foreground);
+  background: var(--apple-border);
+}
+
+.google-search-submit-btn {
+  padding: 0 1.4rem;
+  height: 40px;
+  border-radius: var(--radius-pill);
+  background: #1a73e8;
+  color: #ffffff;
+  font-weight: 600;
+  font-size: 13.5px;
+  border: none;
+  cursor: pointer;
+  transition: var(--apple-transition);
+  box-shadow: 0 2px 6px rgba(26, 115, 232, 0.35);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+}
+
+.google-search-submit-btn:hover:not(:disabled) {
+  background: #1557b0;
+  transform: translateY(-1px);
+}
+
+.google-search-submit-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Quick Region Chips */
+.google-region-chips-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.65rem;
+  overflow-x: auto;
+  padding-bottom: 2px;
+}
+
+.google-region-label {
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--apple-muted);
+  flex-shrink: 0;
+}
+
+.google-chips-scroll {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  overflow-x: auto;
+  white-space: nowrap;
+}
+
+.google-chip-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 11.5px;
+  padding: 3px 9px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--apple-border);
+  background: var(--apple-surface);
+  color: var(--apple-foreground);
+  cursor: pointer;
+  transition: var(--apple-transition);
+  white-space: nowrap;
+}
+
+.google-chip-pill:hover {
+  border-color: #4285f4;
+  color: #1a73e8;
+  background: rgba(66, 133, 244, 0.08);
+}
+
+/* 2-Column Main Workspace */
+.google-picker-body-grid {
+  display: grid;
+  grid-template-columns: 340px 1fr;
+  flex: 1;
+  min-height: 400px;
+  max-height: 460px;
+  overflow: hidden;
+}
+
+@media (max-width: 768px) {
+  .google-picker-body-grid {
+    grid-template-columns: 1fr;
+    max-height: 60vh;
+    overflow-y: auto;
+  }
+}
+
+/* Left Column: Results */
+.google-results-pane {
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid var(--apple-border);
+  background: var(--apple-surface);
+  overflow: hidden;
+}
+
+@media (max-width: 768px) {
+  .google-results-pane {
+    border-right: none;
+    border-bottom: 1px solid var(--apple-border);
+    max-height: 240px;
+  }
+}
+
+.google-pane-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.6rem 1rem;
+  border-bottom: 1px solid var(--apple-border);
+  font-size: 12px;
+  background: var(--apple-surface);
+}
+
+.google-pane-title {
+  color: var(--apple-muted);
+}
+
+.google-count-num {
+  color: #1a73e8;
+}
+
+.google-pane-hint {
+  font-size: 11px;
+  color: var(--apple-muted);
+}
+
+.google-results-scroll {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0.6rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.google-result-card {
+  padding: 0.75rem 0.9rem;
+  border-radius: var(--radius-card);
+  border: 1.5px solid var(--apple-border);
+  background: var(--apple-canvas);
+  cursor: pointer;
+  transition: var(--apple-transition);
+  text-align: left;
+}
+
+.google-result-card:hover {
+  border-color: rgba(66, 133, 244, 0.6);
+  background: var(--apple-surface);
+  transform: translateY(-1px);
+}
+
+.google-result-card.is-selected {
+  border-color: #1a73e8;
+  background: rgba(66, 133, 244, 0.08);
+  box-shadow: 0 2px 8px rgba(66, 133, 244, 0.2);
+}
+
+.google-result-top-row {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-bottom: 0.25rem;
+}
+
+.google-cat-badge {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: rgba(66, 133, 244, 0.12);
+  color: #1a73e8;
+}
+
+.google-region-tag {
+  font-size: 10px;
+  color: var(--apple-muted);
+}
+
+.google-selected-tag {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  font-size: 10.5px;
+  font-weight: 700;
+  color: #1a73e8;
+}
+
+.google-result-name {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--apple-foreground);
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+.google-result-addr {
+  font-size: 11.5px;
+  color: var(--apple-muted);
+  margin: 0.25rem 0 0.35rem 0;
+  line-height: 1.35;
+}
+
+.google-result-coords-footer {
+  font-size: 10.5px;
+  color: var(--apple-muted);
+  font-family: ui-monospace, SFMono-Regular, monospace;
+}
+
+.google-status-box,
+.google-empty-results-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2.5rem 1.2rem;
+  text-align: center;
+  color: var(--apple-muted);
+  height: 100%;
+}
+
+.google-empty-icon {
+  font-size: 1.8rem;
+  margin-bottom: 0.4rem;
+}
+
+.google-empty-title {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--apple-foreground);
+  margin: 0 0 0.25rem 0;
+}
+
+.google-empty-desc {
+  font-size: 11.5px;
+  color: var(--apple-muted);
+  line-height: 1.45;
+  margin: 0;
+}
+
+.google-spinner {
+  color: #1a73e8;
+  margin-bottom: 0.5rem;
+}
+
+.google-status-text {
+  font-size: 12px;
+  color: var(--apple-muted);
+}
+
+/* Right Column: Google Maps */
+.google-map-pane {
+  display: flex;
+  flex-direction: column;
+  background: var(--apple-canvas);
+  position: relative;
+}
+
+.google-map-pane-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.6rem 1rem;
+  border-bottom: 1px solid var(--apple-border);
+  font-size: 12px;
+  background: var(--apple-surface);
+}
+
+.google-map-title-row {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-weight: 600;
+  color: var(--apple-foreground);
+}
+
+.google-map-nav-icon {
+  color: #1a73e8;
+}
+
+.google-rev-loading {
+  font-size: 11px;
+  color: #1a73e8;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  margin-left: 6px;
+}
+
+.google-layer-switch {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  background: var(--apple-canvas);
+  padding: 2px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--apple-border);
+}
+
+.google-layer-btn {
+  padding: 3px 8px;
+  font-size: 11px;
+  font-weight: 600;
+  border-radius: var(--radius-pill);
+  border: none;
+  background: transparent;
+  color: var(--apple-muted);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  transition: var(--apple-transition);
+}
+
+.google-layer-btn.active {
+  background: var(--apple-surface);
+  color: var(--apple-foreground);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+}
+
+.google-map-root-wrapper {
+  flex: 1;
+  position: relative;
+  min-height: 300px;
+}
+
+.google-leaflet-root {
+  width: 100%;
+  height: 100%;
+  min-height: 300px;
+  z-index: 1;
+}
+
+.google-map-coords-floating-pill {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 500;
+  font-size: 11px;
+  font-family: ui-monospace, SFMono-Regular, monospace;
+  background: rgba(255, 255, 255, 0.92);
+  color: #1a73e8;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: var(--radius-pill);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  border: 1px solid rgba(66, 133, 244, 0.3);
+}
+
+[data-theme='dark'] .google-map-coords-floating-pill {
+  background: rgba(30, 30, 30, 0.92);
+  color: #8ab4f8;
+}
+
+.google-map-hint-bar {
+  padding: 0.45rem 0.8rem;
+  font-size: 11px;
+  color: var(--apple-muted);
+  background: var(--apple-surface);
+  border-top: 1px solid var(--apple-border);
+  text-align: center;
+}
+
+/* Custom Marker */
+.google-custom-marker-wrap {
+  background: none;
+  border: none;
+}
+
+.google-map-marker-pin {
+  width: 36px;
+  height: 36px;
+  border-radius: 50% 50% 50% 0;
+  background: #ea4335;
+  position: absolute;
+  transform: rotate(-45deg);
+  left: 50%;
+  top: 50%;
+  margin: -18px 0 0 -18px;
+  box-shadow: 0 4px 12px rgba(234, 67, 53, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2.5px solid #ffffff;
+  cursor: grab;
+}
+
+.google-pin-inner-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #ffffff;
+}
+
+.google-marker-pulse {
+  position: absolute;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: rgba(234, 67, 53, 0.35);
+  left: 50%;
+  top: 50%;
+  margin: -12px 0 0 -12px;
+  animation: googlePinPulse 1.8s infinite;
+  pointer-events: none;
+}
+
+@keyframes googlePinPulse {
+  0% { transform: scale(1); opacity: 0.8; }
+  100% { transform: scale(2.6); opacity: 0; }
+}
+
+/* Confirmation Footer */
+.google-picker-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.9rem 1.4rem;
+  border-top: 1px solid var(--apple-border);
+  background: var(--apple-surface);
+}
+
+@media (max-width: 768px) {
+  .google-picker-footer {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+.google-footer-selection-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+  overflow: hidden;
+}
+
+.google-footer-name-edit-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.google-footer-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--apple-foreground);
+  white-space: nowrap;
+}
+
+.google-footer-name-input {
+  flex: 1;
+  padding: 4px 8px;
+  font-size: 13px;
+  font-weight: 600;
+  border-radius: 6px;
+  border: 1px solid var(--apple-border);
+  background: var(--apple-canvas);
+  color: var(--apple-foreground);
+  outline: none;
+}
+
+.google-footer-name-input:focus {
+  border-color: #1a73e8;
+}
+
+.google-footer-addr-info {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 11.5px;
+  color: var(--apple-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.google-footer-coords-badge {
+  font-family: ui-monospace, monospace;
+  color: #1a73e8;
+  font-weight: 600;
+}
+
+.google-footer-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-shrink: 0;
+}
+
+.google-confirm-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0.65rem 1.3rem;
+  border-radius: var(--radius-pill);
+  background: #1a73e8;
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 13.5px;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(26, 115, 232, 0.4);
+  transition: var(--apple-transition);
+  white-space: nowrap;
+}
+
+.google-confirm-btn:hover:not(:disabled) {
+  background: #1557b0;
+  transform: translateY(-1px);
+}
+
+.google-confirm-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Post Editor Spot Block & Badge */
+.google-search-spot-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 0.55rem 0.95rem;
+  border-radius: var(--radius-pill);
+  background: #1a73e8;
+  color: #ffffff;
+  font-size: 12.5px;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  white-space: nowrap;
+  box-shadow: 0 2px 6px rgba(26, 115, 232, 0.35);
+  transition: var(--apple-transition);
+}
+
+.google-search-spot-btn:hover {
+  background: #1557b0;
+  transform: translateY(-1px);
+}
+
+.google-g-icon-small {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  background: #ffffff;
+  color: #1a73e8;
+  font-weight: 900;
+  font-size: 10px;
+}
+
+.google-confirmed-badge {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.8rem;
+  margin-top: 0.5rem;
+  padding: 0.65rem 0.9rem;
+  border-radius: var(--radius-card);
+  background: rgba(66, 133, 244, 0.06);
+  border: 1.5px solid rgba(66, 133, 244, 0.35);
+  width: 100%;
+}
+
+.google-badge-status {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: #1a73e8;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.google-check-icon {
+  color: #1a73e8;
+}
+
+.google-badge-rechange-btn {
+  padding: 4px 9px;
+  border-radius: var(--radius-pill);
+  background: #1a73e8;
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: var(--apple-transition);
+  white-space: nowrap;
+}
+
+.google-badge-rechange-btn:hover {
+  background: #1557b0;
+}
+
+/* Timeline and Detail Map Link Buttons */
+.apple-timeline-btn-google,
+.apple-map-link-google {
+  color: #1a73e8;
+  border-color: rgba(66, 133, 244, 0.3);
+  background: rgba(66, 133, 244, 0.05);
+}
+
+.apple-timeline-btn-google:hover,
+.apple-map-link-google:hover {
+  background: rgba(66, 133, 244, 0.12);
+  border-color: #1a73e8;
+  color: #1557b0;
+}
+
+.google-g-icon-xs {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  background: #4285f4;
+  color: #ffffff;
+  font-weight: 900;
+  font-size: 8.5px;
+}
+
+
 
 
 

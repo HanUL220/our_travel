@@ -94,7 +94,7 @@ export default function PostEditorModal({ onClose, onSavePost, postToEdit = null
     setBlocks(prev => prev.filter(b => b.id !== id));
   };
 
-  // Open Kakao (Daum) Postcode address search popup (Original requested way)
+  // Open Kakao (Daum) Postcode address search popup with precision geocoding
   const handleOpenSearchForBlock = (blockId) => {
     const openPostcode = () => {
       new window.daum.Postcode({
@@ -102,13 +102,16 @@ export default function PostEditorModal({ onClose, onSavePost, postToEdit = null
           const selectedPlace = data.buildingName ? data.buildingName : (data.roadAddress || data.address);
           const roadAddr = data.roadAddress || data.address;
 
-          // Geocode address with postal details (sigungu, bname, roadname) for 100% pinpoint coordinates
+          // Multi-stage high precision geocoding using full postal details
           const coords = await geocodeKoreanAddress(roadAddr, location, {
             sido: data.sido,
             sigungu: data.sigungu,
             bname: data.bname,
             roadname: data.roadname,
-            buildingName: data.buildingName
+            buildingName: data.buildingName,
+            zonecode: data.zonecode,
+            jibunAddress: data.jibunAddress,
+            autoJibunAddress: data.autoJibunAddress
           });
 
           setBlocks(prev => prev.map(b => {
@@ -454,7 +457,7 @@ export default function PostEditorModal({ onClose, onSavePost, postToEdit = null
                                   type="button" 
                                   className="apple-search-spot-btn"
                                   onClick={() => handleOpenSearchForBlock(block.id)}
-                                  title="주소/위치 검색으로 정확한 좌표 설정"
+                                  title="카카오 주소/위치 검색으로 정확한 좌표 설정"
                                 >
                                   <Search size={13} />
                                   <span>주소/위치 검색</span>
