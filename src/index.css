@@ -367,20 +367,68 @@ input, textarea, select {
   gap: 0.45rem;
   background: var(--apple-surface);
   border: 1px solid var(--apple-border);
-  padding: 0.45rem 1rem;
+  padding: 0.45rem 1.05rem;
   border-radius: var(--radius-pill);
-  font-size: 13px;
+  font-size: 13.5px;
   color: var(--apple-foreground);
   box-shadow: var(--shadow-subtle);
+  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  outline: none;
+  font-family: inherit;
+}
+
+.apple-stat-pill.interactive {
+  cursor: pointer;
+}
+
+.apple-stat-pill.interactive:hover {
+  transform: translateY(-2px);
+  border-color: var(--apple-primary);
+  background: var(--apple-surface);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+}
+
+.apple-stat-pill.interactive:active {
+  transform: translateY(0);
+}
+
+.apple-stat-pill.active {
+  background: var(--apple-primary);
+  border-color: var(--apple-primary);
+  color: #ffffff;
+  box-shadow: 0 6px 18px rgba(255, 45, 85, 0.35);
+}
+
+.apple-stat-pill.active .stat-icon,
+.apple-stat-pill.active strong {
+  color: #ffffff;
+}
+
+.stat-pill-active-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #ffffff;
+  margin-left: 2px;
+  display: inline-block;
+  animation: applePulse 1.8s infinite;
+}
+
+@keyframes applePulse {
+  0% { transform: scale(0.9); opacity: 0.7; }
+  50% { transform: scale(1.2); opacity: 1; }
+  100% { transform: scale(0.9); opacity: 0.7; }
 }
 
 .stat-icon {
   color: var(--apple-primary);
+  transition: color 0.2s ease;
 }
 
 .apple-stat-pill strong {
   color: var(--apple-primary);
-  font-weight: 600;
+  font-weight: 700;
+  transition: color 0.2s ease;
 }
 
 /* ==========================================================================
@@ -3673,6 +3721,687 @@ textarea:focus {
   font-weight: 900;
   font-size: 8.5px;
 }
+
+/* ==========================================================================
+   View Mode Switching: Places Collection & Photos Gallery
+   ========================================================================== */
+
+.view-mode-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  background: var(--apple-surface);
+  border: 1px solid var(--apple-border);
+  padding: 1.1rem 1.4rem;
+  border-radius: var(--radius-card);
+  margin-bottom: 1.8rem;
+  box-shadow: var(--shadow-subtle);
+  animation: fadeIn 0.3s ease;
+}
+
+.view-mode-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.view-mode-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--apple-primary);
+}
+
+.view-mode-badge.photo-badge {
+  color: #30b0c7;
+}
+
+.view-mode-desc {
+  font-size: 0.85rem;
+  color: var(--apple-muted);
+  margin: 0;
+}
+
+.view-mode-desc strong {
+  color: var(--apple-foreground);
+}
+
+.view-mode-reset-btn {
+  background: var(--apple-canvas);
+  border: 1px solid var(--apple-border);
+  color: var(--apple-foreground);
+  font-size: 0.84rem;
+  font-weight: 600;
+  padding: 0.5rem 0.95rem;
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: var(--apple-transition);
+}
+
+.view-mode-reset-btn:hover {
+  background: var(--apple-border);
+  color: var(--apple-foreground);
+}
+
+/* --------------------------------------------------------------------------
+   Places Collection Grid
+   -------------------------------------------------------------------------- */
+.places-collection-view {
+  animation: fadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.places-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+  gap: 1.5rem;
+}
+
+.place-card {
+  background: var(--apple-surface);
+  border: 1px solid var(--apple-border);
+  border-radius: var(--radius-card);
+  overflow: hidden;
+  box-shadow: var(--shadow-subtle);
+  transition: all 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  flex-direction: column;
+}
+
+.place-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-card);
+  border-color: rgba(255, 45, 85, 0.25);
+}
+
+.place-card-main {
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.place-card-image-wrap {
+  position: relative;
+  width: 100%;
+  height: 180px;
+  overflow: hidden;
+  background: var(--apple-canvas);
+}
+
+.place-card-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+}
+
+.place-card:hover .place-card-image {
+  transform: scale(1.04);
+}
+
+.place-card-badges {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  display: flex;
+  gap: 6px;
+  z-index: 2;
+}
+
+.place-count-badge,
+.place-photo-count-badge {
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  color: #ffffff;
+  font-size: 11.5px;
+  font-weight: 600;
+  padding: 4px 9px;
+  border-radius: var(--radius-pill);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.place-photo-count-badge {
+  background: rgba(48, 176, 199, 0.85);
+}
+
+.place-card-body {
+  padding: 1.15rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  flex: 1;
+}
+
+.place-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.place-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.place-pin-icon {
+  color: var(--apple-primary);
+  flex-shrink: 0;
+}
+
+.place-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--apple-foreground);
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+.place-action-hint {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--apple-primary);
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.action-chevron {
+  transition: transform 0.25s ease;
+}
+
+.action-chevron.rotated {
+  transform: rotate(90deg);
+}
+
+.place-meta-date {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.82rem;
+  color: var(--apple-muted);
+}
+
+.place-spots-flow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-top: 0.2rem;
+}
+
+.place-spot-tag {
+  font-size: 11px;
+  background: var(--apple-canvas);
+  color: var(--apple-muted);
+  border: 1px solid var(--apple-border);
+  padding: 2px 7px;
+  border-radius: 6px;
+  font-weight: 500;
+}
+
+.place-spot-tag.more {
+  color: var(--apple-primary);
+  font-weight: 600;
+}
+
+/* Expanded Multi-Post Drawer */
+.place-posts-drawer {
+  background: var(--apple-canvas);
+  padding: 0.9rem 1.15rem 1.15rem;
+  border-top: 1px dashed var(--apple-border);
+  animation: fadeIn 0.25s ease;
+}
+
+.drawer-title-row {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--apple-muted);
+  margin-bottom: 0.65rem;
+}
+
+.drawer-posts-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.drawer-post-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  background: var(--apple-surface);
+  border: 1px solid var(--apple-border);
+  padding: 0.5rem 0.7rem;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: var(--apple-transition);
+}
+
+.drawer-post-item:hover {
+  border-color: var(--apple-primary);
+  transform: translateX(3px);
+}
+
+.drawer-post-thumb {
+  width: 44px;
+  height: 44px;
+  border-radius: 6px;
+  overflow: hidden;
+  flex-shrink: 0;
+  background: var(--apple-canvas);
+}
+
+.drawer-post-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.drawer-post-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.drawer-post-title {
+  font-size: 0.86rem;
+  font-weight: 600;
+  color: var(--apple-foreground);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.drawer-post-date {
+  font-size: 0.75rem;
+  color: var(--apple-muted);
+  margin-top: 1px;
+}
+
+.drawer-arrow {
+  color: var(--apple-muted);
+  flex-shrink: 0;
+}
+
+.places-empty-state,
+.photos-empty-state {
+  text-align: center;
+  padding: 4.5rem 1rem;
+  color: var(--apple-muted);
+}
+
+.places-empty-state .empty-icon,
+.photos-empty-state .empty-icon {
+  margin-bottom: 1rem;
+  opacity: 0.6;
+}
+
+.places-empty-state h3,
+.photos-empty-state h3 {
+  font-size: 1.15rem;
+  color: var(--apple-foreground);
+  margin-bottom: 0.4rem;
+}
+
+.places-empty-state p,
+.photos-empty-state p {
+  font-size: 0.88rem;
+  margin: 0;
+}
+
+/* --------------------------------------------------------------------------
+   Photos Gallery Grid (Apple / Instagram Style)
+   -------------------------------------------------------------------------- */
+.photos-gallery-view {
+  animation: fadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.photos-grid-layout {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: 1rem;
+}
+
+@media (max-width: 640px) {
+  .photos-grid-layout {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.6rem;
+  }
+}
+
+.gallery-photo-card {
+  position: relative;
+  border-radius: var(--radius-card);
+  overflow: hidden;
+  background: var(--apple-surface);
+  box-shadow: var(--shadow-subtle);
+  cursor: pointer;
+  aspect-ratio: 1 / 1;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  outline: none;
+}
+
+.gallery-photo-card:hover {
+  transform: scale(1.025);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.14);
+  z-index: 2;
+}
+
+.gallery-image-wrapper {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+.gallery-photo-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.gallery-photo-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0.3) 50%, rgba(0, 0, 0, 0.5) 100%);
+  opacity: 0;
+  transition: opacity 0.25s ease;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 0.85rem;
+  color: #ffffff;
+}
+
+.gallery-photo-card:hover .gallery-photo-overlay {
+  opacity: 1;
+}
+
+.overlay-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.4rem;
+}
+
+.overlay-location-chip {
+  background: rgba(255, 255, 255, 0.22);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  padding: 3px 7px;
+  border-radius: var(--radius-pill);
+  font-size: 11px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.overlay-cover-chip {
+  background: var(--apple-primary);
+  color: #ffffff;
+  padding: 2px 6px;
+  border-radius: var(--radius-pill);
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.overlay-bottom {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.overlay-title {
+  font-size: 0.88rem;
+  font-weight: 700;
+  margin: 0;
+  line-height: 1.3;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.overlay-caption {
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.85);
+  margin: 0;
+  line-height: 1.3;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.overlay-date {
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.65);
+  margin-top: 2px;
+}
+
+/* --------------------------------------------------------------------------
+   Photo Lightbox Overlay (Full Image Viewer)
+   -------------------------------------------------------------------------- */
+.photo-lightbox-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.88);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  z-index: 1100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  animation: fadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.photo-lightbox-container {
+  position: relative;
+  width: 100%;
+  max-width: 960px;
+  max-height: 92vh;
+  display: flex;
+  flex-direction: column;
+  background: rgba(26, 26, 28, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.6);
+}
+
+.lightbox-top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.9rem 1.25rem;
+  background: rgba(0, 0, 0, 0.35);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.lightbox-counter {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.7);
+  letter-spacing: 0.02em;
+}
+
+.lightbox-close-btn {
+  background: rgba(255, 255, 255, 0.12);
+  border: none;
+  color: #ffffff;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: var(--apple-transition);
+}
+
+.lightbox-close-btn:hover {
+  background: rgba(255, 255, 255, 0.25);
+  transform: scale(1.05);
+}
+
+.lightbox-stage {
+  position: relative;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #000000;
+  min-height: 380px;
+  max-height: 60vh;
+  overflow: hidden;
+}
+
+.lightbox-image-wrap {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.lightbox-main-img {
+  max-width: 100%;
+  max-height: 60vh;
+  object-fit: contain;
+  user-select: none;
+  animation: fadeIn 0.2s ease;
+}
+
+.lightbox-nav-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: var(--apple-transition);
+  z-index: 10;
+}
+
+.lightbox-nav-btn:hover {
+  background: rgba(255, 255, 255, 0.25);
+  transform: translateY(-50%) scale(1.08);
+}
+
+.lightbox-nav-btn.prev {
+  left: 14px;
+}
+
+.lightbox-nav-btn.next {
+  right: 14px;
+}
+
+.lightbox-bottom-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.2rem;
+  padding: 1.1rem 1.4rem;
+  background: rgba(0, 0, 0, 0.45);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  flex-wrap: wrap;
+}
+
+.lightbox-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  flex: 1;
+  min-width: 200px;
+}
+
+.lightbox-meta-chips {
+  display: flex;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.lightbox-meta-item {
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.7);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.lightbox-post-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0;
+}
+
+.lightbox-caption {
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.82);
+  margin: 0;
+  line-height: 1.4;
+}
+
+.lightbox-post-link-btn {
+  background: var(--apple-primary);
+  color: #ffffff;
+  border: none;
+  padding: 0.65rem 1.15rem;
+  border-radius: var(--radius-pill);
+  font-size: 0.86rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  transition: var(--apple-transition);
+  white-space: nowrap;
+  box-shadow: 0 4px 12px rgba(255, 45, 85, 0.35);
+}
+
+.lightbox-post-link-btn:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.1);
+  box-shadow: 0 6px 18px rgba(255, 45, 85, 0.45);
+}
+
+@media (max-width: 640px) {
+  .photo-lightbox-overlay {
+    padding: 0.5rem;
+  }
+  
+  .lightbox-bottom-bar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.8rem;
+  }
+  
+  .lightbox-post-link-btn {
+    justify-content: center;
+  }
+}
+
 
 
 

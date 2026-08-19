@@ -16,6 +16,9 @@ import {
   isSupabaseConfigured 
 } from './utils/supabaseClient';
 
+import PlacesCollection from './components/PlacesCollection';
+import PhotosGallery from './components/PhotosGallery';
+
 export default function App() {
   // Posts state with LocalStorage persistence & Supabase fallback
   const [posts, setPosts] = useState(() => {
@@ -34,6 +37,9 @@ export default function App() {
   });
 
   const [isLoading, setIsLoading] = useState(isSupabaseConfigured);
+
+  // View mode state: 'posts' (default feed) | 'places' (grouped by region) | 'photos' (gallery)
+  const [viewMode, setViewMode] = useState('posts');
 
   // Theme state
   const [theme, setTheme] = useState(() => {
@@ -163,6 +169,11 @@ export default function App() {
     return inTitle || inLocation || inDate || inSummary || inBlocks;
   });
 
+  // Calculate unique location count
+  const uniqueLocationsCount = new Set(
+    posts.map(p => (p.location || '').trim().toLowerCase()).filter(Boolean)
+  ).size;
+
   // Calculate total photo count
   const totalPhotosCount = posts.reduce((sum, p) => {
     let count = p.mainImage ? 1 : 0;
@@ -184,7 +195,10 @@ export default function App() {
       <main className="main-content">
         <HeroSection 
           totalPosts={posts.length} 
+          totalLocations={uniqueLocationsCount}
           totalPhotos={totalPhotosCount}
+          activeView={viewMode}
+          onViewChange={setViewMode}
         />
 
         <FilterBar 
@@ -192,17 +206,8 @@ export default function App() {
           onSearchChange={setSearchQuery}
         />
 
-        {filteredPosts.length > 0 ? (
-          <div className="posts-grid">
-            {filteredPosts.map(post => (
-              <PostCard
-                key={post.id}
-                post={post}
-                onSelectPost={setSelectedPost}
-              />
-            ))}
-          </div>
-        ) : posts.length === 0 ? (
+        {/* View Mode Switching */}
+        {posts.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '4.5rem 1.5rem', color: 'var(--text-light)', background: 'var(--apple-canvas)', borderRadius: 'var(--radius-card)', margin: '1rem 0' }}>
             <div style={{ fontSize: '2.5rem', marginBottom: '0.8rem' }}>✈️</div>
             <h3 style={{ fontSize: '1.25rem', fontWeight: '600', marginBottom: '0.5rem', color: 'var(--apple-foreground)' }}>
@@ -219,6 +224,30 @@ export default function App() {
             >
               + 첫 번째 추억 추가하기
             </button>
+          </div>
+        ) : viewMode === 'places' ? (
+          <PlacesCollection 
+            posts={filteredPosts}
+            searchQuery={searchQuery}
+            onSelectPost={setSelectedPost}
+            onResetView={() => setViewMode('posts')}
+          />
+        ) : viewMode === 'photos' ? (
+          <PhotosGallery 
+            posts={filteredPosts}
+            searchQuery={searchQuery}
+            onSelectPost={setSelectedPost}
+            onResetView={() => setViewMode('posts')}
+          />
+        ) : filteredPosts.length > 0 ? (
+          <div className="posts-grid">
+            {filteredPosts.map(post => (
+              <PostCard
+                key={post.id}
+                post={post}
+                onSelectPost={setSelectedPost}
+              />
+            ))}
           </div>
         ) : (
           <div style={{ textAlign: 'center', padding: '4rem 1rem', color: 'var(--apple-muted)' }}>
