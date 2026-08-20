@@ -18,6 +18,7 @@ import {
 
 import PlacesCollection from './components/PlacesCollection';
 import PhotosGallery from './components/PhotosGallery';
+import KoreaMapCollection from './components/KoreaMapCollection';
 
 export default function App() {
   // Posts state with LocalStorage persistence & Supabase fallback
@@ -89,8 +90,12 @@ export default function App() {
     setTheme(prev => (prev === 'light' ? 'dark' : 'light'));
   };
 
-  const handleOpenCreate = () => {
-    setPostToEdit(null);
+  const handleOpenCreate = (preset = null) => {
+    if (preset && preset.location) {
+      setPostToEdit({ location: preset.location });
+    } else {
+      setPostToEdit(null);
+    }
     setIsEditorOpen(true);
   };
 
@@ -225,11 +230,11 @@ export default function App() {
               + 첫 번째 추억 추가하기
             </button>
           </div>
-        ) : viewMode === 'places' ? (
-          <PlacesCollection 
+        ) : viewMode === 'map' ? (
+          <KoreaMapCollection 
             posts={filteredPosts}
-            searchQuery={searchQuery}
             onSelectPost={setSelectedPost}
+            onOpenCreate={handleOpenCreate}
             onResetView={() => setViewMode('posts')}
           />
         ) : viewMode === 'photos' ? (

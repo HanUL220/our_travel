@@ -4,7 +4,7 @@ import ImageUploader from './ImageUploader';
 import { geocodeKoreanAddress } from '../utils/geoUtils';
 
 export default function PostEditorModal({ onClose, onSavePost, postToEdit = null }) {
-  const isEditMode = Boolean(postToEdit);
+  const isEditMode = Boolean(postToEdit && postToEdit.id);
 
   // Determine initial trip type (당일 vs 연박)
   const initialTripType = postToEdit?.tripType || (postToEdit?.endDate && postToEdit?.endDate !== postToEdit?.startDate ? 'multi' : 'single');

@@ -4402,6 +4402,518 @@ textarea:focus {
   }
 }
 
+/* ==========================================================================
+   Korea Interactive Map View (17 Administrative Divisions)
+   ========================================================================== */
+.korea-map-collection-container {
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 1rem 0 3rem 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  animation: appleFadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.map-view-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  padding: 0.85rem 1.4rem;
+  background: var(--apple-surface);
+  border: 1px solid var(--apple-border);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-subtle);
+}
+
+.map-back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: var(--apple-canvas);
+  border: 1px solid var(--apple-border);
+  border-radius: var(--radius-pill);
+  font-size: 0.88rem;
+  font-weight: 500;
+  color: var(--apple-foreground);
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.map-back-btn:hover {
+  background: var(--apple-primary);
+  border-color: var(--apple-primary);
+  color: #ffffff;
+  transform: translateX(-2px);
+  box-shadow: 0 4px 12px rgba(255, 45, 85, 0.25);
+}
+
+.map-progress-summary {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.progress-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.88rem;
+  color: var(--apple-foreground);
+}
+
+.progress-badge strong {
+  color: var(--apple-primary);
+  font-weight: 700;
+}
+
+.progress-icon {
+  color: var(--apple-primary);
+}
+
+.progress-bar-wrap {
+  width: 140px;
+  height: 8px;
+  background: var(--apple-canvas);
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid var(--apple-border);
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #FF2D55 0%, #FF6482 100%);
+  border-radius: 10px;
+  transition: width 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Main 2-Column Grid Layout */
+.korea-map-main-layout {
+  display: grid;
+  grid-template-columns: 460px 1fr;
+  gap: 1.8rem;
+  align-items: start;
+}
+
+@media (max-width: 1024px) {
+  .korea-map-main-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Map Interactive Card */
+.map-interactive-card {
+  background: var(--apple-surface);
+  border: 1px solid var(--apple-border);
+  border-radius: var(--radius-card);
+  padding: 1.5rem;
+  box-shadow: var(--shadow-card);
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+  position: sticky;
+  top: 80px;
+}
+
+.map-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.8rem;
+}
+
+.map-card-title-row {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.map-card-emoji {
+  font-size: 1.6rem;
+}
+
+.map-card-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--apple-foreground);
+  margin: 0;
+}
+
+.map-card-subtitle {
+  font-size: 0.82rem;
+  color: var(--apple-muted);
+  margin: 0.2rem 0 0 0;
+  line-height: 1.4;
+}
+
+.map-clear-filter-btn {
+  padding: 0.35rem 0.75rem;
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: var(--apple-primary);
+  background: rgba(255, 45, 85, 0.08);
+  border: 1px solid rgba(255, 45, 85, 0.2);
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+}
+
+.map-clear-filter-btn:hover {
+  background: var(--apple-primary);
+  color: #ffffff;
+}
+
+/* Quick Region Selector Pills Bar */
+.map-region-pills-bar {
+  display: flex;
+  gap: 0.35rem;
+  overflow-x: auto;
+  padding: 0.2rem 0.1rem 0.5rem 0.1rem;
+  scrollbar-width: thin;
+}
+
+.map-region-pills-bar::-webkit-scrollbar {
+  height: 4px;
+}
+
+.map-region-pills-bar::-webkit-scrollbar-thumb {
+  background: var(--apple-border);
+  border-radius: 4px;
+}
+
+.region-pill-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.32rem 0.65rem;
+  border-radius: var(--radius-pill);
+  font-size: 0.78rem;
+  font-weight: 500;
+  white-space: nowrap;
+  background: var(--apple-canvas);
+  border: 1px solid var(--apple-border);
+  color: var(--apple-foreground);
+  cursor: pointer;
+  transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+  flex-shrink: 0;
+}
+
+.region-pill-btn:hover {
+  border-color: var(--apple-primary);
+  transform: translateY(-1px);
+}
+
+.region-pill-btn.visited {
+  border-color: rgba(255, 45, 85, 0.35);
+  background: rgba(255, 45, 85, 0.06);
+  color: var(--apple-foreground);
+}
+
+.region-pill-btn .pill-count {
+  background: var(--apple-primary);
+  color: #ffffff;
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 0.05rem 0.35rem;
+  border-radius: 10px;
+}
+
+.region-pill-btn.active {
+  background: var(--apple-primary);
+  border-color: var(--apple-primary);
+  color: #ffffff;
+  box-shadow: 0 4px 10px rgba(255, 45, 85, 0.35);
+}
+
+.region-pill-btn.active .pill-count {
+  background: #ffffff;
+  color: var(--apple-primary);
+}
+
+/* SVG Map Render */
+.korea-svg-wrapper {
+  position: relative;
+  width: 100%;
+  max-width: 420px;
+  margin: 0 auto;
+  aspect-ratio: 540 / 720;
+  background: var(--apple-canvas);
+  border-radius: var(--radius-card);
+  padding: 0.5rem;
+  border: 1px solid var(--apple-border);
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.04);
+}
+
+.korea-vector-map {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* Region SVG Path States */
+.korea-region-path {
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  stroke-width: 2.2;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+/* Unvisited Region */
+.korea-region-path.is-unvisited {
+  fill: var(--apple-surface);
+  stroke: var(--apple-border);
+  opacity: 0.85;
+}
+
+.korea-region-path.is-unvisited:hover,
+.korea-region-path.is-unvisited.is-hovered {
+  fill: rgba(0, 122, 255, 0.12);
+  stroke: #007AFF;
+  opacity: 1;
+  stroke-width: 2.8;
+}
+
+/* Visited Region */
+.korea-region-path.is-visited {
+  fill: url(#visitedGrad);
+  stroke: #ffffff;
+  stroke-width: 2.4;
+  opacity: 0.95;
+}
+
+[data-theme='dark'] .korea-region-path.is-visited {
+  stroke: #1C1C1E;
+}
+
+.korea-region-path.is-visited:hover,
+.korea-region-path.is-visited.is-hovered {
+  fill: #FF2D55;
+  filter: drop-shadow(0 4px 12px rgba(255, 45, 85, 0.45));
+  stroke-width: 3;
+}
+
+/* Selected Region */
+.korea-region-path.is-selected {
+  fill: url(#selectedGrad) !important;
+  stroke: #ffffff !important;
+  stroke-width: 3.5 !important;
+  opacity: 1 !important;
+}
+
+[data-theme='dark'] .korea-region-path.is-selected {
+  stroke: #FFFFFF !important;
+}
+
+/* Islands annotation text */
+.island-label {
+  font-size: 11px;
+  font-weight: 600;
+  fill: var(--apple-muted);
+  letter-spacing: -0.2px;
+}
+
+/* Map Label & Bubble */
+.map-simple-label {
+  font-size: 12px;
+  font-weight: 600;
+  fill: var(--apple-muted);
+  letter-spacing: -0.2px;
+  opacity: 0.75;
+}
+
+.map-badge-bubble {
+  fill: #ffffff;
+  stroke: #FF2D55;
+  stroke-width: 2;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  transition: all 0.2s ease;
+}
+
+.map-badge-node.selected .map-badge-bubble {
+  fill: #FF2D55;
+  stroke: #ffffff;
+}
+
+.map-badge-text.name {
+  font-size: 10px;
+  font-weight: 700;
+  fill: #FF2D55;
+  letter-spacing: -0.3px;
+}
+
+.map-badge-node.selected .map-badge-text.name {
+  fill: #ffffff;
+}
+
+.map-badge-text.count {
+  font-size: 9.5px;
+  font-weight: 800;
+  fill: #1C1C1E;
+}
+
+.map-badge-node.selected .map-badge-text.count {
+  fill: #ffffff;
+}
+
+/* Map Legend */
+.map-legend-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.8rem;
+  flex-wrap: wrap;
+  padding-top: 0.4rem;
+  border-top: 1px solid var(--apple-border);
+  font-size: 0.78rem;
+  color: var(--apple-muted);
+}
+
+.legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.legend-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.legend-dot.visited {
+  background: #FF2D55;
+  box-shadow: 0 0 6px rgba(255, 45, 85, 0.5);
+}
+
+.legend-dot.unvisited {
+  background: var(--apple-canvas);
+  border: 1.5px solid var(--apple-border);
+}
+
+.legend-item.tip {
+  width: 100%;
+  font-size: 0.75rem;
+  color: var(--apple-muted);
+  opacity: 0.85;
+}
+
+/* Right Column: Region Posts Section */
+.map-posts-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+.region-posts-header-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  background: var(--apple-surface);
+  border: 1px solid var(--apple-border);
+  border-radius: var(--radius-card);
+  padding: 1.25rem 1.6rem;
+  box-shadow: var(--shadow-subtle);
+}
+
+.region-header-info {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.region-header-emoji {
+  font-size: 2rem;
+}
+
+.region-header-title {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--apple-foreground);
+  margin: 0;
+  letter-spacing: -0.3px;
+}
+
+.region-header-desc {
+  font-size: 0.86rem;
+  color: var(--apple-muted);
+  margin: 0.25rem 0 0 0;
+}
+
+.region-create-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.5rem 0.95rem;
+  background: var(--apple-primary);
+  color: #ffffff;
+  border: none;
+  border-radius: var(--radius-pill);
+  font-size: 0.84rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 4px 10px rgba(255, 45, 85, 0.3);
+}
+
+.region-create-cta:hover {
+  transform: translateY(-1.5px);
+  box-shadow: 0 6px 14px rgba(255, 45, 85, 0.4);
+}
+
+/* Region Posts Grid */
+.region-posts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.4rem;
+}
+
+/* Region Empty State */
+.region-empty-state-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 4rem 1.5rem;
+  background: var(--apple-surface);
+  border: 1px dashed var(--apple-border);
+  border-radius: var(--radius-card);
+  gap: 0.6rem;
+}
+
+.empty-state-emoji {
+  font-size: 3rem;
+  margin-bottom: 0.4rem;
+}
+
+.empty-state-title {
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: var(--apple-foreground);
+  margin: 0;
+}
+
+.empty-state-title strong {
+  color: var(--apple-primary);
+}
+
+.empty-state-text {
+  font-size: 0.9rem;
+  color: var(--apple-muted);
+  max-width: 360px;
+  margin: 0 0 1rem 0;
+  line-height: 1.5;
+}
+
+
 
 
 
