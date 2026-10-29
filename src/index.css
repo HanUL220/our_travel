@@ -5417,15 +5417,15 @@ textarea:focus {
 
   /* 
     모바일 상단 년·월 화살표(▼) 피커 차단 레이어
-    - 가운데 2026. 10. ▼ 영역을 클릭 차단하여 피커 팝업 열림 방지!
-    - 우측 54px(일간/월간 보기 전환 버튼)은 블로커에서 제외하여 자유롭게 터치 활성화!
+    - 좌측 55px(뒤로가기 버튼 영역)과 우측 55px(일간/월간 전환 버튼 영역)은 완전히 비워둠!
+    - 오직 가운데 2026. 10. ▼ 화살표 영역만 정확히 덮어서 피커 팝업 열림 방지!
   */
   .calendar-mobile-header-blocker {
     display: block !important;
     position: absolute;
     top: 0;
-    left: 0;
-    right: 54px;
+    left: 55px;
+    right: 55px;
     height: 52px;
     background: transparent;
     z-index: 5;
@@ -5433,6 +5433,7 @@ textarea:focus {
     cursor: default;
   }
 }
+
 
 
 
