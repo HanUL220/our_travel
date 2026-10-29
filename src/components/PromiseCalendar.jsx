@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState } from 'react';
 import { ArrowLeft, RotateCw, Calendar } from 'lucide-react';
 
 export default function PromiseCalendar({ onResetView }) {
@@ -10,10 +10,6 @@ export default function PromiseCalendar({ onResetView }) {
   const [isLoading, setIsLoading] = useState(true);
   const [isRotating, setIsRotating] = useState(false);
 
-  // DOM refs for synchronous touch/click interception
-  const wrapperRef = useRef(null);
-  const interceptorRef = useRef(null);
-
   // Handle manual reload
   const handleReload = () => {
     setIsRotating(true);
@@ -23,66 +19,6 @@ export default function PromiseCalendar({ onResetView }) {
       setIsRotating(false);
     }, 800);
   };
-
-  // 모바일 전용: 상하단 월 스크롤은 100% 유지하면서, 날짜 탭(클릭 시 일간 뷰 전환)만 동기적으로 요격
-  useEffect(() => {
-    const wrapper = wrapperRef.current;
-    const interceptor = interceptorRef.current;
-    if (!wrapper || !interceptor) return;
-
-    let startX = 0;
-    let startY = 0;
-    let isScroll = false;
-    let blockTimer = null;
-
-    const onTouchStart = (e) => {
-      if (e.touches && e.touches[0]) {
-        startX = e.touches[0].clientX;
-        startY = e.touches[0].clientY;
-        isScroll = false;
-      }
-    };
-
-    const onTouchMove = (e) => {
-      if (e.touches && e.touches[0]) {
-        const dx = Math.abs(e.touches[0].clientX - startX);
-        const dy = Math.abs(e.touches[0].clientY - startY);
-        // 손가락이 5px 이상 움직이면 상하단 월 스크롤 중임
-        if (dy > 5 || dx > 5) {
-          isScroll = true;
-          // 스크롤 중에는 인터셉터를 꺼서 iframe 내부 상하 스크롤이 매끄럽게 작동하도록 통과
-          interceptor.style.pointerEvents = 'none';
-        }
-      }
-    };
-
-    const onTouchEnd = () => {
-      // 손가락 이동이 없었다면 단순 탭(날짜 클릭) 시도임!
-      if (!isScroll) {
-        // 즉시 동기(Synchronous)로 인터셉터의 pointer-events를 auto로 켜서 브라우저의 pending click을 가로챔!
-        interceptor.style.pointerEvents = 'auto';
-
-        if (blockTimer) clearTimeout(blockTimer);
-        blockTimer = setTimeout(() => {
-          if (interceptor) {
-            interceptor.style.pointerEvents = 'none';
-          }
-        }, 400);
-      }
-    };
-
-    // capture phase로 부모 창에서 먼저 터치를 감지
-    wrapper.addEventListener('touchstart', onTouchStart, { capture: true, passive: true });
-    wrapper.addEventListener('touchmove', onTouchMove, { capture: true, passive: true });
-    wrapper.addEventListener('touchend', onTouchEnd, { capture: true, passive: true });
-
-    return () => {
-      wrapper.removeEventListener('touchstart', onTouchStart, { capture: true });
-      wrapper.removeEventListener('touchmove', onTouchMove, { capture: true });
-      wrapper.removeEventListener('touchend', onTouchEnd, { capture: true });
-      if (blockTimer) clearTimeout(blockTimer);
-    };
-  }, []);
 
   return (
     <div className="promise-calendar-container animate-fade-in">
@@ -146,10 +82,7 @@ export default function PromiseCalendar({ onResetView }) {
                 </div>
               )}
 
-              <div 
-                ref={wrapperRef}
-                className="calendar-iframe-scroll-wrapper"
-              >
+              <div className="calendar-iframe-scroll-wrapper">
                 <iframe
                   key={iframeKey}
                   src={calendarUrl}
@@ -172,40 +105,14 @@ export default function PromiseCalendar({ onResetView }) {
                 />
 
                 {/* 
-                  2. 모바일 우측 상단 일간 보기 버튼 가림막 (불투명 흰색으로 덮어 완전히 지워버림)
-                */}
-                <div 
-                  className="calendar-mobile-hide-right-menu" 
-                  aria-hidden="true"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                  }}
-                />
-
-                {/* 
-                  3. 모바일 상단 52px 헤더 클릭 차단 레이어
+                  2. 모바일 상단 년·월 화살표(▼) 피커 차단 레이어
                      - 2026. 10. 년/월 텍스트는 선명하게 보임
-                     - 화살표(▼) 피커 열림 기능 원천 차단!
+                     - 화살표(▼) 피커 열림 기능 차단 유지!
+                     - 우측의 일간/월간 보기 전환 버튼은 비워두어 자유롭게 클릭 활성화!
                 */}
                 <div 
                   className="calendar-mobile-header-blocker" 
                   aria-hidden="true"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                  }}
-                />
-
-                {/* 
-                  4. 모바일 날짜 탭 클릭 차단 스마트 인터셉터
-                     - 상하단 스크롤 중에는 pointer-events: none 으로 풀려 부드럽게 스크롤 통과!
-                     - 날짜를 제자리에서 탭(클릭)한 순간에만 동기적으로 pointer-events: auto가 켜져 일간 전환 차단!
-                */}
-                <div 
-                  ref={interceptorRef}
-                  className="calendar-mobile-tap-interceptor" 
-                  title="일정 조회 전용"
                   onClick={(e) => {
                     e.preventDefault();
                     e.stopPropagation();
