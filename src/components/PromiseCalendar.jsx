@@ -111,19 +111,6 @@ export default function PromiseCalendar({ onResetView }) {
                   className="calendar-mobile-hide-right-menu" 
                   aria-hidden="true"
                 />
-
-                {/* 
-                  3. 모바일용 달력 날짜 클릭 차단 오버레이
-                     (날짜 눌러도 일간 뷰로 안 바뀌게 차단, 상단 년·월 및 하단 오늘 버튼은 클릭 가능)
-                */}
-                <div 
-                  className="calendar-mobile-date-blocker" 
-                  title="일정 조회 전용"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                  }}
-                />
               </div>
             </>
           )}
