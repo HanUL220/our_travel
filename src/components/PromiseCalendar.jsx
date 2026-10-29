@@ -62,6 +62,11 @@ export default function PromiseCalendar({ onResetView }) {
             <Calendar size={18} className="calendar-title-icon" />
             <span>약속 캘린더</span>
           </div>
+
+          {/* 모바일에서만 보이는 가벼운 조작 힌트 */}
+          <div className="calendar-mobile-swipe-guide">
+            <span>좌우로 밀거나 <strong>년·월(▼)</strong>을 눌러 월 이동</span>
+          </div>
         </div>
 
         {/* Iframe Viewport Container */}

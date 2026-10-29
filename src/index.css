@@ -5293,6 +5293,11 @@ textarea:focus {
   color: var(--apple-primary);
 }
 
+/* 모바일 전용 월 이동 힌트 (데스크톱에서는 숨김) */
+.calendar-mobile-swipe-guide {
+  display: none;
+}
+
 /* Iframe Viewport Container */
 .calendar-iframe-viewport {
   position: relative;
@@ -5315,7 +5320,7 @@ textarea:focus {
 }
 
 /* 
-  네이버 캘린더 하단 푸터(♥와 NAVER 캘린더 로고, 높이 41px)를 
+  데스크톱: 네이버 캘린더 하단 푸터(♥와 NAVER 캘린더 로고, 높이 41px)를 
   overflow: hidden으로 완벽히 잘라내기 위한 래퍼
 */
 .calendar-iframe-scroll-wrapper {
@@ -5325,18 +5330,6 @@ textarea:focus {
   overflow: hidden;
 }
 
-@media (max-width: 680px) {
-  .calendar-iframe-scroll-wrapper {
-    overflow-x: auto;
-    overflow-y: hidden;
-    -webkit-overflow-scrolling: touch;
-    height: 560px;
-  }
-}
-
-/* 
-  하단 푸터(41px)가 래퍼 바깥으로 밀려나 숨겨지도록 calc(100% + 42px) 적용
-*/
 .calendar-iframe {
   width: 100%;
   height: calc(100% + 42px);
@@ -5355,7 +5348,7 @@ textarea:focus {
 }
 
 /* 
-  상단 62px(월 이동 버튼)은 클릭되도록 비워두고,
+  데스크톱: 상단 62px(월 이동 버튼)은 클릭되도록 비워두고,
   일정 클릭 시 네이버 팝업이 뜨는 것을 완벽 차단하는 투명 오버레이
 */
 .calendar-schedule-click-blocker {
@@ -5371,12 +5364,19 @@ textarea:focus {
   cursor: default;
 }
 
-@media (max-width: 640px) {
+/* ==========================================================================
+   모바일 최적화 (가로 100% 자동 맞춤 & 상단 분홍색 안내 배너 제거)
+   ========================================================================== */
+@media (max-width: 680px) {
   .calendar-view-header {
     padding: 0.6rem 0.85rem;
   }
   .calendar-card-header {
-    padding: 0.9rem 1.1rem;
+    padding: 0.85rem 1.1rem;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.5rem;
   }
   .live-sync-indicator {
     padding: 0.35rem 0.65rem;
@@ -5386,4 +5386,43 @@ textarea:focus {
     padding: 0.35rem 0.65rem;
     font-size: 0.76rem;
   }
+
+  /* 모바일 월 이동 힌트 활성화 */
+  .calendar-mobile-swipe-guide {
+    display: inline-flex;
+    font-size: 0.73rem;
+    color: var(--apple-muted);
+    background: var(--apple-canvas);
+    padding: 0.25rem 0.55rem;
+    border-radius: var(--radius-pill);
+    border: 1px solid var(--apple-border);
+    white-space: nowrap;
+  }
+  .calendar-mobile-swipe-guide strong {
+    color: var(--apple-primary);
+  }
+
+  /* 모바일 래퍼: 가로 스크롤 없이 화면에 딱 맞게 */
+  .calendar-iframe-scroll-wrapper {
+    width: 100%;
+    height: 520px;
+    overflow: hidden;
+  }
+
+  /* 
+    1. min-width 강제 해제 -> 모바일 화면 가로폭에 100% 딱 맞게!
+    2. margin-top: -82px -> 상단 분홍색 배너(♥ HanUL님이 만든 공개 캘린더입니다...) 완벽 제거!
+  */
+  .calendar-iframe {
+    width: 100% !important;
+    min-width: 0 !important;
+    margin-top: -82px !important;
+    height: calc(100% + 82px) !important;
+  }
+
+  /* 모바일에서는 상단 2026. 10. ▼ 탭과 좌우 스와이프를 위해 블로커 해제 */
+  .calendar-schedule-click-blocker {
+    display: none !important;
+  }
 }
+
