@@ -62,11 +62,6 @@ export default function PromiseCalendar({ onResetView }) {
             <Calendar size={18} className="calendar-title-icon" />
             <span>약속 캘린더</span>
           </div>
-
-          {/* 모바일에서만 보이는 가벼운 조작 힌트 */}
-          <div className="calendar-mobile-swipe-guide">
-            <span>좌우로 밀거나 <strong>년·월(▼)</strong>을 눌러 월 이동</span>
-          </div>
         </div>
 
         {/* Iframe Viewport Container */}
@@ -96,12 +91,33 @@ export default function PromiseCalendar({ onResetView }) {
                   onLoad={() => setIsLoading(false)}
                   loading="eager"
                 />
+
                 {/* 
-                  상단 62px(월 이동 버튼)은 클릭되도록 비워두고,
-                  일정 클릭 시 네이버 팝업이 뜨는 것을 완벽 차단하는 투명 오버레이 
+                  1. 데스크톱용 일정 클릭 팝업 차단 오버레이 
                 */}
                 <div 
                   className="calendar-schedule-click-blocker" 
+                  title="일정 조회 전용"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                  }}
+                />
+
+                {/* 
+                  2. 모바일용 우측 상단 일간 보기 버튼 가림막 (보이지도 않고 눌리지도 않게 차단)
+                */}
+                <div 
+                  className="calendar-mobile-hide-right-menu" 
+                  aria-hidden="true"
+                />
+
+                {/* 
+                  3. 모바일용 달력 날짜 클릭 차단 오버레이
+                     (날짜 눌러도 일간 뷰로 안 바뀌게 차단, 상단 년·월 및 하단 오늘 버튼은 클릭 가능)
+                */}
+                <div 
+                  className="calendar-mobile-date-blocker" 
                   title="일정 조회 전용"
                   onClick={(e) => {
                     e.preventDefault();
@@ -116,4 +132,5 @@ export default function PromiseCalendar({ onResetView }) {
     </div>
   );
 }
+
 

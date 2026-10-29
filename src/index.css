@@ -5364,8 +5364,14 @@ textarea:focus {
   cursor: default;
 }
 
+/* 모바일 전용 블로커 및 가림막 기본값 (데스크톱에서는 숨김) */
+.calendar-mobile-hide-right-menu,
+.calendar-mobile-date-blocker {
+  display: none;
+}
+
 /* ==========================================================================
-   모바일 최적화 (가로 100% 자동 맞춤 & 상단 분홍색 안내 배너 제거)
+   모바일 최적화 (가로 100% 자동 맞춤, 분홍 배너 제거, 일간 버튼 가림 및 날짜 클릭 차단)
    ========================================================================== */
 @media (max-width: 680px) {
   .calendar-view-header {
@@ -5373,10 +5379,9 @@ textarea:focus {
   }
   .calendar-card-header {
     padding: 0.85rem 1.1rem;
-    flex-direction: row;
-    justify-content: space-between;
+    display: flex;
     align-items: center;
-    gap: 0.5rem;
+    justify-content: space-between;
   }
   .live-sync-indicator {
     padding: 0.35rem 0.65rem;
@@ -5387,23 +5392,9 @@ textarea:focus {
     font-size: 0.76rem;
   }
 
-  /* 모바일 월 이동 힌트 활성화 */
-  .calendar-mobile-swipe-guide {
-    display: inline-flex;
-    font-size: 0.73rem;
-    color: var(--apple-muted);
-    background: var(--apple-canvas);
-    padding: 0.25rem 0.55rem;
-    border-radius: var(--radius-pill);
-    border: 1px solid var(--apple-border);
-    white-space: nowrap;
-  }
-  .calendar-mobile-swipe-guide strong {
-    color: var(--apple-primary);
-  }
-
   /* 모바일 래퍼: 가로 스크롤 없이 화면에 딱 맞게 */
   .calendar-iframe-scroll-wrapper {
+    position: relative;
     width: 100%;
     height: 520px;
     overflow: hidden;
@@ -5420,9 +5411,46 @@ textarea:focus {
     height: calc(100% + 82px) !important;
   }
 
-  /* 모바일에서는 상단 2026. 10. ▼ 탭과 좌우 스와이프를 위해 블로커 해제 */
+  /* 데스크톱용 62px 블로커는 모바일에서 해제 */
   .calendar-schedule-click-blocker {
     display: none !important;
   }
+
+  /* 
+    1. 모바일 우측 상단 일간 보기 버튼 가림막
+       (네이버 헤더 흰색 배경으로 덮어서 눈에 보이지도 않고 클릭도 불가능하게 차단)
+  */
+  .calendar-mobile-hide-right-menu {
+    display: block !important;
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 55px;
+    height: 50px;
+    background: #ffffff;
+    z-index: 4;
+    pointer-events: auto;
+    cursor: default;
+  }
+
+  /* 
+    2. 모바일 달력 날짜 셀 클릭 차단 (오직 조회 전용)
+       - 상단 50px(2026. 10. ▼ 헤더)은 남겨두어 클릭 가능
+       - 하단 65px(오늘 플로팅 버튼)은 남겨두어 클릭 가능
+       - 가운데 날짜 셀은 터치해도 일간 뷰로 바뀌지 않도록 차단
+  */
+  .calendar-mobile-date-blocker {
+    display: block !important;
+    position: absolute;
+    top: 50px;
+    left: 0;
+    right: 0;
+    bottom: 65px;
+    z-index: 3;
+    pointer-events: auto;
+    background: transparent;
+    cursor: default;
+  }
 }
+
 
