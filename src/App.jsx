@@ -19,6 +19,7 @@ import {
 import PlacesCollection from './components/PlacesCollection';
 import PhotosGallery from './components/PhotosGallery';
 import KoreaMapCollection from './components/KoreaMapCollection';
+import PromiseCalendar from './components/PromiseCalendar';
 
 export default function App() {
   // Posts state with LocalStorage persistence & Supabase fallback
@@ -206,13 +207,19 @@ export default function App() {
           onViewChange={setViewMode}
         />
 
-        <FilterBar 
-          searchQuery={searchQuery}
-          onSearchChange={setSearchQuery}
-        />
+        {viewMode !== 'calendar' && (
+          <FilterBar 
+            searchQuery={searchQuery}
+            onSearchChange={setSearchQuery}
+          />
+        )}
 
         {/* View Mode Switching */}
-        {posts.length === 0 ? (
+        {viewMode === 'calendar' ? (
+          <PromiseCalendar 
+            onResetView={() => setViewMode('posts')}
+          />
+        ) : posts.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '4.5rem 1.5rem', color: 'var(--text-light)', background: 'var(--apple-canvas)', borderRadius: 'var(--radius-card)', margin: '1rem 0' }}>
             <div style={{ fontSize: '2.5rem', marginBottom: '0.8rem' }}>✈️</div>
             <h3 style={{ fontSize: '1.25rem', fontWeight: '600', marginBottom: '0.5rem', color: 'var(--apple-foreground)' }}>

@@ -5162,11 +5162,228 @@ textarea:focus {
   line-height: 1.5;
 }
 
+/* ==========================================================================
+   Promise Calendar View (Naver Calendar Integration)
+   ========================================================================== */
+.promise-calendar-container {
+  width: 100%;
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 0.5rem 0 3rem 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  box-sizing: border-box;
+  animation: appleFadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
 
+.calendar-view-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  padding: 0.75rem 1.2rem;
+  background: var(--apple-surface);
+  border: 1px solid var(--apple-border);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-subtle);
+  box-sizing: border-box;
+}
 
+.calendar-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
 
+/* 실시간 연동 중 (새로고침 왼쪽 배치) */
+.live-sync-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.4rem 0.75rem;
+  background: rgba(52, 199, 89, 0.1);
+  border: 1px solid rgba(52, 199, 89, 0.25);
+  border-radius: var(--radius-pill);
+  font-size: 0.78rem;
+  color: #34c759;
+  font-weight: 600;
+  white-space: nowrap;
+}
 
+.pulse-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #34c759;
+  animation: livePulse 1.6s infinite ease-in-out;
+}
 
+@keyframes livePulse {
+  0% { transform: scale(0.9); opacity: 0.6; }
+  50% { transform: scale(1.3); opacity: 1; }
+  100% { transform: scale(0.9); opacity: 0.6; }
+}
 
+.calendar-action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.42rem 0.85rem;
+  background: var(--apple-canvas);
+  border: 1px solid var(--apple-border);
+  border-radius: var(--radius-pill);
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--apple-foreground);
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  white-space: nowrap;
+}
 
+.calendar-action-btn:hover {
+  background: var(--apple-surface);
+  border-color: var(--apple-primary);
+  color: var(--apple-primary);
+  transform: translateY(-1px);
+}
 
+.calendar-action-btn.rotating svg {
+  animation: spinCalendar 0.8s ease-in-out;
+}
+
+@keyframes spinCalendar {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Main Calendar Card */
+.calendar-card-frame {
+  background: var(--apple-surface);
+  border: 1px solid var(--apple-border);
+  border-radius: 24px;
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.calendar-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.1rem 1.5rem;
+  border-bottom: 1px solid var(--apple-border);
+  background: var(--apple-surface);
+}
+
+.calendar-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--apple-foreground);
+}
+
+.calendar-badge .calendar-title-icon,
+.calendar-badge .heart-icon {
+  color: var(--apple-primary);
+}
+
+/* Iframe Viewport Container */
+.calendar-iframe-viewport {
+  position: relative;
+  width: 100%;
+  background: #ffffff;
+}
+
+.calendar-loading-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  background: var(--apple-surface);
+  z-index: 5;
+  color: var(--apple-muted);
+  font-size: 0.9rem;
+}
+
+/* 
+  네이버 캘린더 하단 푸터(♥와 NAVER 캘린더 로고, 높이 41px)를 
+  overflow: hidden으로 완벽히 잘라내기 위한 래퍼
+*/
+.calendar-iframe-scroll-wrapper {
+  position: relative;
+  width: 100%;
+  height: 600px;
+  overflow: hidden;
+}
+
+@media (max-width: 680px) {
+  .calendar-iframe-scroll-wrapper {
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    height: 560px;
+  }
+}
+
+/* 
+  하단 푸터(41px)가 래퍼 바깥으로 밀려나 숨겨지도록 calc(100% + 42px) 적용
+*/
+.calendar-iframe {
+  width: 100%;
+  height: calc(100% + 42px);
+  min-width: 640px;
+  border: none;
+  display: block;
+  transition: opacity 0.3s ease;
+}
+
+.calendar-iframe.loading {
+  opacity: 0;
+}
+
+.calendar-iframe.loaded {
+  opacity: 1;
+}
+
+/* 
+  상단 62px(월 이동 버튼)은 클릭되도록 비워두고,
+  일정 클릭 시 네이버 팝업이 뜨는 것을 완벽 차단하는 투명 오버레이
+*/
+.calendar-schedule-click-blocker {
+  position: absolute;
+  top: 62px;
+  left: 0;
+  width: 100%;
+  min-width: 640px;
+  bottom: 0;
+  z-index: 2;
+  pointer-events: auto;
+  background: transparent;
+  cursor: default;
+}
+
+@media (max-width: 640px) {
+  .calendar-view-header {
+    padding: 0.6rem 0.85rem;
+  }
+  .calendar-card-header {
+    padding: 0.9rem 1.1rem;
+  }
+  .live-sync-indicator {
+    padding: 0.35rem 0.65rem;
+    font-size: 0.74rem;
+  }
+  .calendar-action-btn {
+    padding: 0.35rem 0.65rem;
+    font-size: 0.76rem;
+  }
+}

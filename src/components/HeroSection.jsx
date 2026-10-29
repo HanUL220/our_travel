@@ -1,5 +1,5 @@
 import React from 'react';
-import { MapPin, Camera } from 'lucide-react';
+import { MapPin, Camera, Calendar } from 'lucide-react';
 
 export default function HeroSection({ 
   totalPosts, 
@@ -51,8 +51,21 @@ export default function HeroSection({
             <span>간직한 사진 <strong>{totalPhotos}</strong>장</span>
             {activeView === 'photos' && <span className="stat-pill-active-dot" />}
           </button>
+
+          <button
+            type="button"
+            className={`apple-stat-pill interactive ${activeView === 'calendar' ? 'active' : ''}`}
+            onClick={() => handlePillClick('calendar')}
+            aria-pressed={activeView === 'calendar'}
+            title={activeView === 'calendar' ? '전체 여행기로 돌아가기' : '약속 캘린더 보기'}
+          >
+            <Calendar size={14} className="stat-icon" />
+            <span>약속 캘린더</span>
+            {activeView === 'calendar' && <span className="stat-pill-active-dot" />}
+          </button>
         </div>
       </div>
     </section>
   );
 }
+
