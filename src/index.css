@@ -5364,13 +5364,14 @@ textarea:focus {
   cursor: default;
 }
 
-/* 모바일 전용 가림막 기본값 (데스크톱에서는 숨김) */
-.calendar-mobile-hide-right-menu {
+/* 모바일 전용 블로커 기본값 (데스크톱에서는 숨김) */
+.calendar-mobile-header-blocker,
+.calendar-mobile-tap-interceptor {
   display: none;
 }
 
 /* ==========================================================================
-   모바일 최적화 (가로 100% 자동 맞춤, 분홍 배너 제거, 우측 일간 버튼 가림)
+   모바일 최적화 (가로 100% 자동 맞춤, 분홍 배너 제거, 화살표 클릭 차단, 날짜 탭 차단)
    ========================================================================== */
 @media (max-width: 680px) {
   .calendar-view-header {
@@ -5416,22 +5417,47 @@ textarea:focus {
   }
 
   /* 
-    모바일 우측 상단 일간 보기 버튼 가림막
-    (네이버 헤더 흰색 배경으로 덮어서 일간 버튼이 보이지도 않고 눌리지도 않게 차단)
+    1. 모바일 상단 52px 헤더 클릭 차단 레이어
+       - 2026. 10. 년/월 텍스트는 선명하게 보임
+       - 화살표(▼) 피커 열림 기능 완벽 차단!
+       - 우측 상단 일간 보기 버튼도 함께 완벽 차단!
   */
-  .calendar-mobile-hide-right-menu {
+  .calendar-mobile-header-blocker {
     display: block !important;
     position: absolute;
     top: 0;
+    left: 0;
     right: 0;
-    width: 48px;
-    height: 48px;
-    background: #ffffff;
-    z-index: 4;
+    height: 52px;
+    background: transparent;
+    z-index: 5;
     pointer-events: auto;
     cursor: default;
   }
+
+  /* 
+    2. 모바일 날짜 탭 클릭 차단 스마트 인터셉터
+       - 손가락 상하 스크롤 중에는 pointer-events: none 상태라 월 스크롤이 부드럽게 통과됨!
+       - 사용자가 날짜를 '탭(클릭)'한 순간에만 0.35초간 켜져서 클릭을 삼켜 일간 뷰 전환 방지!
+  */
+  .calendar-mobile-tap-interceptor {
+    display: block !important;
+    position: absolute;
+    top: 52px;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: transparent;
+    z-index: 6;
+    pointer-events: none;
+    cursor: default;
+  }
+
+  .calendar-mobile-tap-interceptor.active {
+    pointer-events: auto !important;
+  }
 }
+
 
 
 
