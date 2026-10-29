@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { ArrowLeft, RotateCw, Calendar } from 'lucide-react';
 
 export default function PromiseCalendar({ onResetView }) {
@@ -10,10 +10,9 @@ export default function PromiseCalendar({ onResetView }) {
   const [isLoading, setIsLoading] = useState(true);
   const [isRotating, setIsRotating] = useState(false);
 
-  // 모바일 탭(클릭) 가로채기 상태: 스크롤은 통과시키고 탭 순간에만 클릭을 삼킴
-  const [isClickBlocked, setIsClickBlocked] = useState(false);
-  const touchStartRef = useRef({ x: 0, y: 0, time: 0 });
-  const blockTimerRef = useRef(null);
+  // DOM refs for synchronous touch/click interception
+  const wrapperRef = useRef(null);
+  const interceptorRef = useRef(null);
 
   // Handle manual reload
   const handleReload = () => {
@@ -25,35 +24,65 @@ export default function PromiseCalendar({ onResetView }) {
     }, 800);
   };
 
-  // 모바일 터치 시작
-  const handleTouchStart = (e) => {
-    if (e.touches && e.touches[0]) {
-      touchStartRef.current = {
-        x: e.touches[0].clientX,
-        y: e.touches[0].clientY,
-        time: Date.now()
-      };
-    }
-  };
+  // 모바일 전용: 상하단 월 스크롤은 100% 유지하면서, 날짜 탭(클릭 시 일간 뷰 전환)만 동기적으로 요격
+  useEffect(() => {
+    const wrapper = wrapperRef.current;
+    const interceptor = interceptorRef.current;
+    if (!wrapper || !interceptor) return;
 
-  // 모바일 터치 끝: 제자리 탭(클릭)인 경우에만 350ms간 클릭 블로커를 활성화하여 일간 뷰 전환 차단
-  const handleTouchEnd = (e) => {
-    if (e.changedTouches && e.changedTouches[0]) {
-      const dx = Math.abs(e.changedTouches[0].clientX - touchStartRef.current.x);
-      const dy = Math.abs(e.changedTouches[0].clientY - touchStartRef.current.y);
-      const dt = Date.now() - touchStartRef.current.time;
+    let startX = 0;
+    let startY = 0;
+    let isScroll = false;
+    let blockTimer = null;
 
-      // 손가락 이동이 8px 미만이고 400ms 미만의 탭 시도인 경우:
-      // 브라우저의 pending click 이벤트를 가로채기 위해 350ms간 블로커 활성화
-      if (dx < 8 && dy < 8 && dt < 400) {
-        setIsClickBlocked(true);
-        if (blockTimerRef.current) clearTimeout(blockTimerRef.current);
-        blockTimerRef.current = setTimeout(() => {
-          setIsClickBlocked(false);
-        }, 350);
+    const onTouchStart = (e) => {
+      if (e.touches && e.touches[0]) {
+        startX = e.touches[0].clientX;
+        startY = e.touches[0].clientY;
+        isScroll = false;
       }
-    }
-  };
+    };
+
+    const onTouchMove = (e) => {
+      if (e.touches && e.touches[0]) {
+        const dx = Math.abs(e.touches[0].clientX - startX);
+        const dy = Math.abs(e.touches[0].clientY - startY);
+        // 손가락이 5px 이상 움직이면 상하단 월 스크롤 중임
+        if (dy > 5 || dx > 5) {
+          isScroll = true;
+          // 스크롤 중에는 인터셉터를 꺼서 iframe 내부 상하 스크롤이 매끄럽게 작동하도록 통과
+          interceptor.style.pointerEvents = 'none';
+        }
+      }
+    };
+
+    const onTouchEnd = () => {
+      // 손가락 이동이 없었다면 단순 탭(날짜 클릭) 시도임!
+      if (!isScroll) {
+        // 즉시 동기(Synchronous)로 인터셉터의 pointer-events를 auto로 켜서 브라우저의 pending click을 가로챔!
+        interceptor.style.pointerEvents = 'auto';
+
+        if (blockTimer) clearTimeout(blockTimer);
+        blockTimer = setTimeout(() => {
+          if (interceptor) {
+            interceptor.style.pointerEvents = 'none';
+          }
+        }, 400);
+      }
+    };
+
+    // capture phase로 부모 창에서 먼저 터치를 감지
+    wrapper.addEventListener('touchstart', onTouchStart, { capture: true, passive: true });
+    wrapper.addEventListener('touchmove', onTouchMove, { capture: true, passive: true });
+    wrapper.addEventListener('touchend', onTouchEnd, { capture: true, passive: true });
+
+    return () => {
+      wrapper.removeEventListener('touchstart', onTouchStart, { capture: true });
+      wrapper.removeEventListener('touchmove', onTouchMove, { capture: true });
+      wrapper.removeEventListener('touchend', onTouchEnd, { capture: true });
+      if (blockTimer) clearTimeout(blockTimer);
+    };
+  }, []);
 
   return (
     <div className="promise-calendar-container animate-fade-in">
@@ -118,9 +147,8 @@ export default function PromiseCalendar({ onResetView }) {
               )}
 
               <div 
+                ref={wrapperRef}
                 className="calendar-iframe-scroll-wrapper"
-                onTouchStart={handleTouchStart}
-                onTouchEnd={handleTouchEnd}
               >
                 <iframe
                   key={iframeKey}
@@ -144,10 +172,21 @@ export default function PromiseCalendar({ onResetView }) {
                 />
 
                 {/* 
-                  2. 모바일 상단 50px 헤더 클릭 차단 오버레이
+                  2. 모바일 우측 상단 일간 보기 버튼 가림막 (불투명 흰색으로 덮어 완전히 지워버림)
+                */}
+                <div 
+                  className="calendar-mobile-hide-right-menu" 
+                  aria-hidden="true"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                  }}
+                />
+
+                {/* 
+                  3. 모바일 상단 52px 헤더 클릭 차단 레이어
                      - 2026. 10. 년/월 텍스트는 선명하게 보임
                      - 화살표(▼) 피커 열림 기능 원천 차단!
-                     - 우측 상단 일간 보기 버튼도 함께 원천 차단!
                 */}
                 <div 
                   className="calendar-mobile-header-blocker" 
@@ -159,12 +198,13 @@ export default function PromiseCalendar({ onResetView }) {
                 />
 
                 {/* 
-                  3. 모바일 날짜 탭 클릭 차단 오버레이 (스마트 인터셉터)
-                     - 손가락 상하 스크롤 중에는 pointer-events: none 상태라 월 스크롤이 부드럽게 동작!
-                     - 사용자가 날짜를 '탭(클릭)'한 순간에만 0.35초간 켜져서 클릭을 삼켜 일간 뷰 전환 방지!
+                  4. 모바일 날짜 탭 클릭 차단 스마트 인터셉터
+                     - 상하단 스크롤 중에는 pointer-events: none 으로 풀려 부드럽게 스크롤 통과!
+                     - 날짜를 제자리에서 탭(클릭)한 순간에만 동기적으로 pointer-events: auto가 켜져 일간 전환 차단!
                 */}
                 <div 
-                  className={`calendar-mobile-tap-interceptor ${isClickBlocked ? 'active' : ''}`}
+                  ref={interceptorRef}
+                  className="calendar-mobile-tap-interceptor" 
                   title="일정 조회 전용"
                   onClick={(e) => {
                     e.preventDefault();
