@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ArrowLeft, RotateCw, Calendar } from 'lucide-react';
+import { ArrowLeft, RotateCw } from 'lucide-react';
 
 export default function PromiseCalendar({ onResetView }) {
   // Calendar URL from environment variable
@@ -56,14 +56,6 @@ export default function PromiseCalendar({ onResetView }) {
 
       {/* Main Calendar Card */}
       <div className="calendar-card-frame">
-        {/* Card Header Bar (깔끔하게 타이틀만 유지) */}
-        <div className="calendar-card-header">
-          <div className="calendar-badge">
-            <Calendar size={18} className="calendar-title-icon" />
-            <span>약속 캘린더</span>
-          </div>
-        </div>
-
         {/* Iframe Viewport Container */}
         <div className="calendar-iframe-viewport">
           {!calendarUrl ? (
