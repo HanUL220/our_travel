@@ -97,7 +97,9 @@ export default function PostEditorModal({ onClose, onSavePost, postToEdit = null
   // Open Kakao (Daum) Postcode address search popup with precision geocoding
   const handleOpenSearchForBlock = (blockId) => {
     const openPostcode = () => {
-      new window.daum.Postcode({
+      const Postcode = (window.kakao && window.kakao.Postcode) || (window.daum && window.daum.Postcode);
+      if (!Postcode) return;
+      new Postcode({
         oncomplete: async (data) => {
           const selectedPlace = data.buildingName ? data.buildingName : (data.roadAddress || data.address);
           const roadAddr = data.roadAddress || data.address;
@@ -131,11 +133,12 @@ export default function PostEditorModal({ onClose, onSavePost, postToEdit = null
       }).open();
     };
 
-    if (window.daum && window.daum.Postcode) {
+    const PostcodeConstructor = (window.kakao && window.kakao.Postcode) || (window.daum && window.daum.Postcode);
+    if (PostcodeConstructor) {
       openPostcode();
     } else {
       const script = document.createElement('script');
-      script.src = '//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js';
+      script.src = '//t1.kakaocdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js';
       script.onload = openPostcode;
       document.head.appendChild(script);
     }
