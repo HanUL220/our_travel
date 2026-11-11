@@ -5,6 +5,41 @@ const geoCache = new Map();
 
 // Built-in pinpoint coordinates for famous Korean Travel Spots & Landmarks
 export const KNOWN_LOCATIONS = {
+  // ==================== 전국 주요 공항 & KTX/SRT 역 ====================
+  '제주공항': { lat: 33.5066, lng: 126.4930, address: '제주특별자치도 제주시 공항로 2', category: '공항/교통', region: '제주' },
+  '제주국제공항': { lat: 33.5066, lng: 126.4930, address: '제주특별자치도 제주시 공항로 2', category: '공항/교통', region: '제주' },
+  '김포공항': { lat: 37.5587, lng: 126.7945, address: '서울특별시 강서구 하늘길 112', category: '공항/교통', region: '서울' },
+  '김포국제공항': { lat: 37.5587, lng: 126.7945, address: '서울특별시 강서구 하늘길 112', category: '공항/교통', region: '서울' },
+  '인천공항': { lat: 37.4602, lng: 126.4407, address: '인천광역시 중구 공항로 272', category: '공항/교통', region: '인천' },
+  '인천국제공항': { lat: 37.4602, lng: 126.4407, address: '인천광역시 중구 공항로 272', category: '공항/교통', region: '인천' },
+  '김해공항': { lat: 35.1729, lng: 128.9387, address: '부산광역시 강서구 공항진입로 108', category: '공항/교통', region: '부산' },
+  '김해국제공항': { lat: 35.1729, lng: 128.9387, address: '부산광역시 강서구 공항진입로 108', category: '공항/교통', region: '부산' },
+  '대구국제공항': { lat: 35.8995, lng: 128.6384, address: '대구광역시 동구 공항로 221', category: '공항/교통', region: '대구' },
+  '대구공항': { lat: 35.8995, lng: 128.6384, address: '대구광역시 동구 공항로 221', category: '공항/교통', region: '대구' },
+  '청주국제공항': { lat: 36.7221, lng: 127.4955, address: '충청북도 청주시 청원구 내수읍 오창대로 980', category: '공항/교통', region: '충북' },
+  '청주공항': { lat: 36.7221, lng: 127.4955, address: '충청북도 청주시 청원구 내수읍 오창대로 980', category: '공항/교통', region: '충북' },
+  '양양국제공항': { lat: 38.0613, lng: 128.6693, address: '강원특별자치도 양양군 손양면 공항로 201', category: '공항/교통', region: '강원' },
+  '양양공항': { lat: 38.0613, lng: 128.6693, address: '강원특별자치도 양양군 손양면 공항로 201', category: '공항/교통', region: '강원' },
+
+  '서울역': { lat: 37.5559, lng: 126.9723, address: '서울특별시 중구 한강대로 405', category: '기차역/KTX', region: '서울' },
+  '서울역 KTX': { lat: 37.5559, lng: 126.9723, address: '서울특별시 중구 한강대로 405', category: '기차역/KTX', region: '서울' },
+  '용산역': { lat: 37.5298, lng: 126.9647, address: '서울특별시 용산구 한강대로23길 55', category: '기차역/KTX', region: '서울' },
+  '수서역': { lat: 37.4874, lng: 127.1017, address: '서울특별시 강남구 밤고개로 99', category: '기차역/SRT', region: '서울' },
+  '수서역 SRT': { lat: 37.4874, lng: 127.1017, address: '서울특별시 강남구 밤고개로 99', category: '기차역/SRT', region: '서울' },
+  '광명역': { lat: 37.4162, lng: 126.8848, address: '경기도 광명시 광명역로 21', category: '기차역/KTX', region: '경기' },
+  '부산역': { lat: 35.1152, lng: 129.0422, address: '부산광역시 동구 중앙대로 206', category: '기차역/KTX', region: '부산' },
+  '동대구역': { lat: 35.8797, lng: 128.6284, address: '대구광역시 동구 동대구로 550', category: '기차역/KTX', region: '대구' },
+  '대전역': { lat: 36.3315, lng: 127.4332, address: '대전광역시 동구 중앙로 215', category: '기차역/KTX', region: '대전' },
+  '강릉역': { lat: 37.7643, lng: 128.8997, address: '강원특별자치도 강릉시 용지로 160', category: '기차역/KTX', region: '강원' },
+  '경주역': { lat: 35.7981, lng: 129.1387, address: '경상북도 경주시 건천읍 신경주역로 80', category: '기차역/KTX', region: '경북' },
+  '신경주역': { lat: 35.7981, lng: 129.1387, address: '경상북도 경주시 건천읍 신경주역로 80', category: '기차역/KTX', region: '경북' },
+  '전주역': { lat: 35.8497, lng: 127.1618, address: '전북특별자치도 전주시 덕진구 동부대로 680', category: '기차역/KTX', region: '전북' },
+  '여수엑스포역': { lat: 34.7529, lng: 127.7459, address: '전라남도 여수시 망양로 2', category: '기차역/KTX', region: '전남' },
+  '여수역': { lat: 34.7529, lng: 127.7459, address: '전라남도 여수시 망양로 2', category: '기차역/KTX', region: '전남' },
+  '광주송정역': { lat: 35.1376, lng: 126.7915, address: '광주광역시 광산구 상무대로 201', category: '기차역/KTX', region: '광주' },
+  '춘천역': { lat: 37.8848, lng: 127.7170, address: '강원특별자치도 춘천시 평화로 26', category: '기차역/ITX', region: '강원' },
+  '남춘천역': { lat: 37.8643, lng: 127.7238, address: '강원특별자치도 춘천시 충열로 13', category: '기차역/ITX', region: '강원' },
+
   // ==================== 제주도 (Jeju) ====================
   '협재해수욕장': { lat: 33.3940, lng: 126.2397, address: '제주특별자치도 제주시 한림읍 한림로 329-10', category: '해변', region: '제주' },
   '협재해변': { lat: 33.3940, lng: 126.2397, address: '제주특별자치도 제주시 한림읍 한림로 329-10', category: '해변', region: '제주' },
@@ -604,4 +639,77 @@ export async function geocodePlaceList(places, regionHint = '') {
   }
 
   return results;
+}
+
+export function getCategoryEmoji(category = '') {
+  const cat = String(category).toLowerCase();
+  if (cat.includes('공항')) return '✈️';
+  if (cat.includes('기차') || cat.includes('ktx') || cat.includes('srt') || cat.includes('itx') || cat.includes('역')) return '🚅';
+  if (cat.includes('해변') || cat.includes('바다')) return '🏖️';
+  if (cat.includes('카페') || cat.includes('베이커리') || cat.includes('디저트')) return '☕';
+  if (cat.includes('시장')) return '🛍️';
+  if (cat.includes('테마파크') || cat.includes('놀이공원')) return '🎡';
+  if (cat.includes('산') || cat.includes('오름') || cat.includes('폭포') || cat.includes('숲')) return '⛰️';
+  if (cat.includes('공원') || cat.includes('호수') || cat.includes('수목원')) return '🌳';
+  if (cat.includes('핫플') || cat.includes('거리')) return '✨';
+  if (cat.includes('궁궐') || cat.includes('문화유적') || cat.includes('사찰')) return '🏯';
+  if (cat.includes('미술관') || cat.includes('전시') || cat.includes('뮤지엄')) return '🖼️';
+  return '📍';
+}
+
+/**
+ * Fast in-memory landmark & spots search for autocomplete
+ * Matches spot names, aliases, and addresses with smart scoring
+ */
+export function searchKnownLocations(query, maxResults = 8) {
+  if (!query || typeof query !== 'string') return [];
+  const cleanQ = query.trim().replace(/\s+/g, '').toLowerCase();
+  if (cleanQ.length < 1) return [];
+
+  const matches = [];
+  const seenKeys = new Set();
+
+  for (const [name, info] of Object.entries(KNOWN_LOCATIONS)) {
+    const cleanName = name.replace(/\s+/g, '').toLowerCase();
+    const cleanAddr = (info.address || '').replace(/\s+/g, '').toLowerCase();
+    const cleanCat = (info.category || '').replace(/\s+/g, '').toLowerCase();
+
+    let score = 0;
+
+    // Exact name match
+    if (cleanName === cleanQ) {
+      score = 100;
+    } else if (cleanName.startsWith(cleanQ)) {
+      score = 80 - Math.min(20, cleanName.length - cleanQ.length);
+    } else if (cleanName.includes(cleanQ)) {
+      score = 60 - Math.min(30, cleanName.length - cleanQ.length);
+    } else if (cleanAddr.includes(cleanQ)) {
+      score = 35;
+    } else if (cleanCat.includes(cleanQ)) {
+      score = 25;
+    }
+
+    if (score > 0) {
+      // Deduplicate by normalized name or address
+      const dedupeKey = `${name}-${info.address}`;
+      if (!seenKeys.has(dedupeKey)) {
+        seenKeys.add(dedupeKey);
+        matches.push({
+          name,
+          displayName: name,
+          address: info.address || '',
+          lat: info.lat,
+          lng: info.lng,
+          category: info.category || '명소',
+          emoji: getCategoryEmoji(info.category),
+          region: info.region || '',
+          score
+        });
+      }
+    }
+  }
+
+  // Sort by score descending
+  matches.sort((a, b) => b.score - a.score);
+  return matches.slice(0, maxResults);
 }
