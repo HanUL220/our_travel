@@ -645,16 +645,143 @@ export function getCategoryEmoji(category = '') {
   const cat = String(category).toLowerCase();
   if (cat.includes('공항')) return '✈️';
   if (cat.includes('기차') || cat.includes('ktx') || cat.includes('srt') || cat.includes('itx') || cat.includes('역')) return '🚅';
+  if (cat.includes('지하철')) return '🚇';
   if (cat.includes('해변') || cat.includes('바다')) return '🏖️';
-  if (cat.includes('카페') || cat.includes('베이커리') || cat.includes('디저트')) return '☕';
+  if (cat.includes('카페') || cat.includes('베이커리') || cat.includes('디저트') || cat.includes('커피')) return '☕';
+  if (cat.includes('음식점') || cat.includes('식당') || cat.includes('맛집') || cat.includes('한식') || cat.includes('중식') || cat.includes('일식') || cat.includes('양식')) return '🍽️';
+  if (cat.includes('숙박') || cat.includes('호텔') || cat.includes('펜션') || cat.includes('리조트') || cat.includes('게스트하우스')) return '🏨';
   if (cat.includes('시장')) return '🛍️';
   if (cat.includes('테마파크') || cat.includes('놀이공원')) return '🎡';
   if (cat.includes('산') || cat.includes('오름') || cat.includes('폭포') || cat.includes('숲')) return '⛰️';
   if (cat.includes('공원') || cat.includes('호수') || cat.includes('수목원')) return '🌳';
   if (cat.includes('핫플') || cat.includes('거리')) return '✨';
   if (cat.includes('궁궐') || cat.includes('문화유적') || cat.includes('사찰')) return '🏯';
-  if (cat.includes('미술관') || cat.includes('전시') || cat.includes('뮤지엄')) return '🖼️';
+  if (cat.includes('미술관') || cat.includes('전시') || cat.includes('뮤지엄') || cat.includes('문화시설')) return '🖼️';
+  if (cat.includes('편의점') || cat.includes('마트') || cat.includes('쇼핑')) return '🏪';
   return '📍';
+}
+
+// ==================== Kakao Maps Places Keyword Search ====================
+let kakaoSdkLoadPromise = null;
+
+export function isKakaoMapConfigured() {
+  return Boolean(import.meta.env.VITE_KAKAO_MAP_KEY && import.meta.env.VITE_KAKAO_MAP_KEY.trim());
+}
+
+/**
+ * Dynamically load Kakao Maps JavaScript SDK (with services library for Places keywordSearch)
+ */
+export function loadKakaoMapSdk() {
+  const apiKey = import.meta.env.VITE_KAKAO_MAP_KEY?.trim();
+  if (!apiKey) {
+    return Promise.resolve(null);
+  }
+
+  if (typeof window !== 'undefined' && window.kakao?.maps?.services?.Places) {
+    return Promise.resolve(window.kakao);
+  }
+
+  if (kakaoSdkLoadPromise) {
+    return kakaoSdkLoadPromise;
+  }
+
+  kakaoSdkLoadPromise = new Promise((resolve) => {
+    const existingScript = document.querySelector('script[data-kakao-maps-sdk="true"]');
+    const onSdkLoaded = () => {
+      if (window.kakao && window.kakao.maps && typeof window.kakao.maps.load === 'function') {
+        window.kakao.maps.load(() => {
+          resolve(window.kakao?.maps?.services?.Places ? window.kakao : null);
+        });
+      } else {
+        resolve(window.kakao?.maps?.services?.Places ? window.kakao : null);
+      }
+    };
+
+    if (existingScript) {
+      if (window.kakao?.maps) {
+        onSdkLoaded();
+      } else {
+        existingScript.addEventListener('load', onSdkLoaded, { once: true });
+        existingScript.addEventListener('error', () => {
+          kakaoSdkLoadPromise = null;
+          resolve(null);
+        }, { once: true });
+      }
+      return;
+    }
+
+    const script = document.createElement('script');
+    script.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=${encodeURIComponent(apiKey)}&libraries=services&autoload=false`;
+    script.async = true;
+    script.dataset.kakaoMapsSdk = 'true';
+    script.onload = onSdkLoaded;
+    script.onerror = () => {
+      kakaoSdkLoadPromise = null;
+      resolve(null);
+    };
+    document.head.appendChild(script);
+  });
+
+  return kakaoSdkLoadPromise;
+}
+
+/**
+ * Search Korean places/brands/landmarks in real-time using Kakao Maps Places API
+ * Returns null if Kakao SDK is unavailable (caller can fallback to searchKnownLocations)
+ */
+export async function searchKakaoPlaces(query, maxResults = 10) {
+  const trimmed = (query || '').trim();
+  if (!trimmed) return [];
+
+  const kakao = await loadKakaoMapSdk();
+  if (!kakao?.maps?.services?.Places) {
+    return null;
+  }
+
+  return new Promise((resolve) => {
+    try {
+      const ps = new kakao.maps.services.Places();
+      ps.keywordSearch(
+        trimmed,
+        (data, status) => {
+          if (status === kakao.maps.services.Status.OK && Array.isArray(data)) {
+            const results = data.slice(0, maxResults).map((item) => {
+              const roadAddr = item.road_address_name || item.address_name || '';
+              const categoryText =
+                item.category_group_name ||
+                (item.category_name ? item.category_name.split('>').pop().trim() : '장소');
+              const regionShort = roadAddr ? roadAddr.split(' ')[0].replace(/(특별자치도|특별자치시|특별시|광역시|도)$/, '') : '';
+
+              return {
+                id: item.id,
+                name: item.place_name,
+                displayName: item.place_name,
+                address: roadAddr,
+                jibunAddress: item.address_name || '',
+                lat: parseFloat(item.y),
+                lng: parseFloat(item.x),
+                category: categoryText,
+                emoji: getCategoryEmoji(`${item.category_group_name || ''} ${item.category_name || ''}`),
+                region: regionShort,
+                phone: item.phone || '',
+                placeUrl: item.place_url || '',
+                source: 'kakao-places'
+              };
+            });
+            resolve(results);
+          } else if (status === kakao.maps.services.Status.ZERO_RESULT) {
+            resolve([]);
+          } else {
+            resolve(null);
+          }
+        },
+        { size: Math.min(15, maxResults) }
+      );
+    } catch (err) {
+      console.warn('Kakao Places search error:', err);
+      resolve(null);
+    }
+  });
 }
 
 /**

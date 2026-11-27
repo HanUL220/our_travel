@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { X, ArrowUp, ArrowDown, Trash2, Image as ImageIcon, Heading, Calendar, CalendarDays, MapPin, Search, CheckCircle2 } from 'lucide-react';
 import ImageUploader from './ImageUploader';
-import { geocodeKoreanAddress, searchKnownLocations } from '../utils/geoUtils';
+import { geocodeKoreanAddress, searchKnownLocations, searchKakaoPlaces, isKakaoMapConfigured } from '../utils/geoUtils';
 
 export default function PostEditorModal({ onClose, onSavePost, postToEdit = null }) {
   const isEditMode = Boolean(postToEdit && postToEdit.id);
@@ -67,11 +67,15 @@ export default function PostEditorModal({ onClose, onSavePost, postToEdit = null
     setBlocks(prev => [...prev, newBlock]);
   };
 
-  // Smart Autocomplete State for Place Blocks
+  // Smart Autocomplete State for Place Blocks (Kakao Places API + Known Locations Fallback)
   const [activeSuggestionBlockId, setActiveSuggestionBlockId] = useState(null);
   const [suggestions, setSuggestions] = useState([]);
+  const [isSearchingPlaces, setIsSearchingPlaces] = useState(false);
+  const [searchSource, setSearchSource] = useState('local'); // 'kakao' | 'local'
+  const searchTimerRef = useRef(null);
+  const searchRequestIdRef = useRef(0);
 
-  // Close dropdown when clicking outside
+  // Close dropdown when clicking outside & cleanup debounce timer
   useEffect(() => {
     const handleDocumentClick = (e) => {
       if (!e.target.closest('.apple-place-autocomplete-container')) {
@@ -79,18 +83,68 @@ export default function PostEditorModal({ onClose, onSavePost, postToEdit = null
       }
     };
     document.addEventListener('click', handleDocumentClick);
-    return () => document.removeEventListener('click', handleDocumentClick);
+    return () => {
+      document.removeEventListener('click', handleDocumentClick);
+      if (searchTimerRef.current) clearTimeout(searchTimerRef.current);
+    };
   }, []);
+
+  const executePlaceSearch = async (blockId, rawQuery) => {
+    const query = (rawQuery || '').trim();
+    if (!query) {
+      setSuggestions([]);
+      setActiveSuggestionBlockId(null);
+      setIsSearchingPlaces(false);
+      return;
+    }
+
+    const requestId = ++searchRequestIdRef.current;
+
+    if (isKakaoMapConfigured()) {
+      setActiveSuggestionBlockId(blockId);
+      setIsSearchingPlaces(true);
+
+      const kakaoResults = await searchKakaoPlaces(query, 10);
+      if (requestId !== searchRequestIdRef.current) return;
+
+      setIsSearchingPlaces(false);
+      if (kakaoResults !== null) {
+        setSuggestions(kakaoResults);
+        setSearchSource('kakao');
+        setActiveSuggestionBlockId(blockId);
+        return;
+      }
+    }
+
+    // Fallback to built-in landmark dictionary if Kakao API key is missing or unavailable
+    const localResults = searchKnownLocations(query, 6);
+    if (requestId !== searchRequestIdRef.current) return;
+    setSuggestions(localResults);
+    setSearchSource('local');
+    setActiveSuggestionBlockId(localResults.length > 0 ? blockId : null);
+  };
 
   const handlePlaceInputChange = (blockId, value) => {
     updateBlock(blockId, 'placeName', value);
-    if (value && value.trim().length >= 1) {
-      const results = searchKnownLocations(value.trim(), 6);
-      setSuggestions(results);
-      setActiveSuggestionBlockId(results.length > 0 ? blockId : null);
-    } else {
+    if (searchTimerRef.current) clearTimeout(searchTimerRef.current);
+
+    const trimmed = (value || '').trim();
+    if (!trimmed) {
+      searchRequestIdRef.current++;
       setSuggestions([]);
       setActiveSuggestionBlockId(null);
+      setIsSearchingPlaces(false);
+      return;
+    }
+
+    if (isKakaoMapConfigured()) {
+      setActiveSuggestionBlockId(blockId);
+      setIsSearchingPlaces(true);
+      searchTimerRef.current = setTimeout(() => {
+        executePlaceSearch(blockId, trimmed);
+      }, 250);
+    } else {
+      executePlaceSearch(blockId, trimmed);
     }
   };
 
@@ -498,61 +552,79 @@ export default function PostEditorModal({ onClose, onSavePost, postToEdit = null
                                   <input 
                                     type="text" 
                                     className="apple-input full-width-input" 
-                                    placeholder="본문에 표시될 장소명 (예: 제주공항, 협재해변, 우리 숙소)"
+                                    placeholder="장소·상호명 검색"
                                     value={block.placeName || ''}
                                     onChange={(e) => handlePlaceInputChange(block.id, e.target.value)}
                                     onFocus={(e) => {
                                       if (e.target.value && e.target.value.trim().length >= 1) {
-                                        const results = searchKnownLocations(e.target.value.trim(), 6);
-                                        setSuggestions(results);
-                                        setActiveSuggestionBlockId(results.length > 0 ? block.id : null);
+                                        executePlaceSearch(block.id, e.target.value);
                                       }
                                     }}
                                     onKeyDown={(e) => {
-                                      if (e.key === 'Escape') setActiveSuggestionBlockId(null);
+                                      if (e.key === 'Escape') {
+                                        setActiveSuggestionBlockId(null);
+                                      } else if (e.key === 'Enter') {
+                                        e.preventDefault();
+                                        if (searchTimerRef.current) clearTimeout(searchTimerRef.current);
+                                        executePlaceSearch(block.id, block.placeName || '');
+                                      }
                                     }}
                                   />
                                   <button 
                                     type="button" 
                                     className="apple-search-spot-btn"
                                     onClick={() => handleOpenSearchForBlock(block.id)}
-                                    title="카카오 주소/위치 검색으로 정확한 도로명 주소 설정"
+                                    title="도로명/지번 주소로 직접 검색하기"
                                   >
                                     <Search size={13} />
-                                    <span>주소/위치 검색</span>
+                                    <span>도로명 주소</span>
                                   </button>
                                 </div>
 
-                                {/* Smart Autocomplete Dropdown */}
-                                {activeSuggestionBlockId === block.id && suggestions.length > 0 && (
+                                {/* Smart Autocomplete Dropdown (Kakao Maps Places / Local Fallback) */}
+                                {activeSuggestionBlockId === block.id && (isSearchingPlaces || suggestions.length > 0 || (searchSource === 'kakao' && (block.placeName || '').trim().length >= 1)) && (
                                   <div className="apple-spot-autocomplete-dropdown">
                                     <div className="apple-autocomplete-header">
-                                      <span>추천 명소 / 교통 거점</span>
-                                      <span className="apple-autocomplete-count">{suggestions.length}개 발견</span>
+                                      <span>
+                                        {searchSource === 'kakao' ? '카카오맵 장소 검색' : '추천 명소 / 교통 거점'}
+                                      </span>
+                                      <span className="apple-autocomplete-count">
+                                        {isSearchingPlaces ? '검색 중...' : `${suggestions.length}개 발견`}
+                                      </span>
                                     </div>
                                     <div className="apple-autocomplete-list">
-                                      {suggestions.map((spot, sIdx) => (
-                                        <button
-                                          key={`${spot.name}-${sIdx}`}
-                                          type="button"
-                                          className="apple-autocomplete-item"
-                                          onClick={() => handleSelectSuggestion(block.id, spot)}
-                                        >
-                                          <div className="apple-autocomplete-emoji">{spot.emoji || '📍'}</div>
-                                          <div className="apple-autocomplete-info">
-                                            <div className="apple-autocomplete-title-row">
-                                              <strong className="apple-autocomplete-name">{spot.name}</strong>
-                                              {spot.category && (
-                                                <span className="apple-autocomplete-cat-badge">{spot.category}</span>
-                                              )}
-                                              {spot.region && (
-                                                <span className="apple-autocomplete-region-badge">{spot.region}</span>
-                                              )}
+                                      {isSearchingPlaces && suggestions.length === 0 ? (
+                                        <div className="apple-autocomplete-status">
+                                          카카오맵에서 장소를 찾는 중...
+                                        </div>
+                                      ) : suggestions.length === 0 ? (
+                                        <div className="apple-autocomplete-status">
+                                          검색 결과가 없습니다. 다른 키워드나 [도로명 주소] 검색을 이용해 보세요.
+                                        </div>
+                                      ) : (
+                                        suggestions.map((spot, sIdx) => (
+                                          <button
+                                            key={`${spot.id || spot.name}-${sIdx}`}
+                                            type="button"
+                                            className="apple-autocomplete-item"
+                                            onClick={() => handleSelectSuggestion(block.id, spot)}
+                                          >
+                                            <div className="apple-autocomplete-emoji">{spot.emoji || '📍'}</div>
+                                            <div className="apple-autocomplete-info">
+                                              <div className="apple-autocomplete-title-row">
+                                                <strong className="apple-autocomplete-name">{spot.name}</strong>
+                                                {spot.category && (
+                                                  <span className="apple-autocomplete-cat-badge">{spot.category}</span>
+                                                )}
+                                                {spot.region && (
+                                                  <span className="apple-autocomplete-region-badge">{spot.region}</span>
+                                                )}
+                                              </div>
+                                              <div className="apple-autocomplete-address">📍 {spot.address}</div>
                                             </div>
-                                            <div className="apple-autocomplete-address">📍 {spot.address}</div>
-                                          </div>
-                                        </button>
-                                      ))}
+                                          </button>
+                                        ))
+                                      )}
                                     </div>
                                   </div>
                                 )}
