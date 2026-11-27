@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { X, ArrowUp, ArrowDown, Trash2, Image as ImageIcon, Heading, Calendar, CalendarDays, MapPin, Search, CheckCircle2 } from 'lucide-react';
+import { X, ArrowUp, ArrowDown, Trash2, Image as ImageIcon, Heading, Calendar, CalendarDays, MapPin, CheckCircle2 } from 'lucide-react';
 import ImageUploader from './ImageUploader';
-import { geocodeKoreanAddress, searchKnownLocations, searchKakaoPlaces, isKakaoMapConfigured } from '../utils/geoUtils';
+import { searchKnownLocations, searchKakaoPlaces, isKakaoMapConfigured } from '../utils/geoUtils';
 
 export default function PostEditorModal({ onClose, onSavePost, postToEdit = null }) {
   const isEditMode = Boolean(postToEdit && postToEdit.id);
@@ -191,56 +191,6 @@ export default function PostEditorModal({ onClose, onSavePost, postToEdit = null
 
   const removeBlock = (id) => {
     setBlocks(prev => prev.filter(b => b.id !== id));
-  };
-
-  // Open Kakao (Daum) Postcode address search popup with precision geocoding
-  const handleOpenSearchForBlock = (blockId) => {
-    const openPostcode = () => {
-      const Postcode = (window.kakao && window.kakao.Postcode) || (window.daum && window.daum.Postcode);
-      if (!Postcode) return;
-      new Postcode({
-        oncomplete: async (data) => {
-          const selectedPlace = data.buildingName ? data.buildingName : (data.roadAddress || data.address);
-          const roadAddr = data.roadAddress || data.address;
-
-          // Multi-stage high precision geocoding using full postal details
-          const coords = await geocodeKoreanAddress(roadAddr, location, {
-            sido: data.sido,
-            sigungu: data.sigungu,
-            bname: data.bname,
-            roadname: data.roadname,
-            buildingName: data.buildingName,
-            zonecode: data.zonecode,
-            jibunAddress: data.jibunAddress,
-            autoJibunAddress: data.autoJibunAddress
-          });
-
-          setBlocks(prev => prev.map(b => {
-            if (b.id === blockId) {
-              return {
-                ...b,
-                placeName: b.placeName && b.placeName.trim() ? b.placeName : selectedPlace,
-                address: roadAddr,
-                lat: coords?.lat ? parseFloat(coords.lat) : null,
-                lng: coords?.lng ? parseFloat(coords.lng) : null,
-                originalSpotName: selectedPlace
-              };
-            }
-            return b;
-          }));
-        }
-      }).open();
-    };
-
-    const PostcodeConstructor = (window.kakao && window.kakao.Postcode) || (window.daum && window.daum.Postcode);
-    if (PostcodeConstructor) {
-      openPostcode();
-    } else {
-      const script = document.createElement('script');
-      script.src = '//t1.kakaocdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js';
-      script.onload = openPostcode;
-      document.head.appendChild(script);
-    }
   };
 
   const handleClearCoords = (blockId) => {
@@ -570,15 +520,6 @@ export default function PostEditorModal({ onClose, onSavePost, postToEdit = null
                                       }
                                     }}
                                   />
-                                  <button 
-                                    type="button" 
-                                    className="apple-search-spot-btn"
-                                    onClick={() => handleOpenSearchForBlock(block.id)}
-                                    title="도로명/지번 주소로 직접 검색하기"
-                                  >
-                                    <Search size={13} />
-                                    <span>도로명 주소</span>
-                                  </button>
                                 </div>
 
                                 {/* Smart Autocomplete Dropdown (Kakao Maps Places / Local Fallback) */}
@@ -599,7 +540,7 @@ export default function PostEditorModal({ onClose, onSavePost, postToEdit = null
                                         </div>
                                       ) : suggestions.length === 0 ? (
                                         <div className="apple-autocomplete-status">
-                                          검색 결과가 없습니다. 다른 키워드나 [도로명 주소] 검색을 이용해 보세요.
+                                          검색 결과가 없습니다. 다른 키워드로 검색해 보세요.
                                         </div>
                                       ) : (
                                         suggestions.map((spot, sIdx) => (
@@ -648,13 +589,6 @@ export default function PostEditorModal({ onClose, onSavePost, postToEdit = null
                                   <div className="naver-badge-actions">
                                     <button 
                                       type="button" 
-                                      className="naver-badge-rechange-btn"
-                                      onClick={() => handleOpenSearchForBlock(block.id)}
-                                    >
-                                      주소 변경
-                                    </button>
-                                    <button 
-                                      type="button" 
                                       className="naver-badge-clear-btn"
                                       onClick={() => handleClearCoords(block.id)}
                                       title="좌표 초기화"
@@ -665,7 +599,7 @@ export default function PostEditorModal({ onClose, onSavePost, postToEdit = null
                                 </div>
                               ) : (
                                 <div className="apple-spot-unconfirmed-guide">
-                                  <span>💡 우측 <strong>[주소/위치 검색]</strong> 버튼을 눌러 주소를 선택하면 해당 주소 기준 좌표가 정확하게 고정됩니다.</span>
+                                  <span>💡 장소나 상호명을 입력하고 검색 목록에서 선택하면 좌표가 정확하게 고정됩니다.</span>
                                 </div>
                               )}
                             </div>
