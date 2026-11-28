@@ -268,7 +268,7 @@ export default function PostEditorModal({ onClose, onSavePost, postToEdit = null
           {/* Scrollable Body */}
           <div className="apple-modal-body">
             <p className="apple-editor-desc">
-              일정(날짜)별 구분과 사진, 소제목, 방문 장소를 원하는 순서대로 자유롭게 배치하세요.
+              일정(날짜)별 구분과 방문 장소, 사진을 원하는 순서대로 자유롭게 배치하세요.
             </p>
 
             {/* General Info Section */}
@@ -402,16 +402,13 @@ export default function PostEditorModal({ onClose, onSavePost, postToEdit = null
                 </span>
               </div>
 
-              {/* Block Action Pills: '글 쓰기' removed as requested */}
+              {/* Block Action Pills */}
               <div className="apple-add-block-bar">
                 <button type="button" className="apple-add-pill" onClick={() => addBlock('day')}>
                   <CalendarDays size={14} /> 일정 / 날짜
                 </button>
                 <button type="button" className="apple-add-pill" onClick={() => addBlock('place')}>
                   <MapPin size={14} /> 장소 / 스팟
-                </button>
-                <button type="button" className="apple-add-pill" onClick={() => addBlock('heading')}>
-                  <Heading size={14} /> 소제목
                 </button>
                 <button type="button" className="apple-add-pill" onClick={() => addBlock('image')}>
                   <ImageIcon size={14} /> 사진 추가
@@ -424,7 +421,7 @@ export default function PostEditorModal({ onClose, onSavePost, postToEdit = null
                   <div className="apple-empty-guide-icon">✨</div>
                   <p className="apple-empty-guide-title">본문 블록이 아직 비어있습니다</p>
                   <p className="apple-empty-guide-sub">
-                    위의 <strong>[일정/날짜]</strong>, <strong>[장소/스팟]</strong>, <strong>[소제목]</strong>, <strong>[사진 추가]</strong> 버튼을 눌러 원하는 순서대로 자유롭게 추억을 채워보세요!
+                    위의 <strong>[일정/날짜]</strong>, <strong>[장소/스팟]</strong>, <strong>[사진 추가]</strong> 버튼을 눌러 원하는 순서대로 자유롭게 추억을 채워보세요!
                   </p>
                 </div>
               ) : (

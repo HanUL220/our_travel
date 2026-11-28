@@ -18,7 +18,15 @@ export default function Header({ theme, toggleTheme, onOpenNewPost, startDate = 
   return (
     <header className="site-header">
       <div className="header-inner">
-        <a href="#" className="brand-logo">
+        <a
+          href="./"
+          className="brand-logo"
+          onClick={(e) => {
+            e.preventDefault();
+            window.location.reload();
+          }}
+          title="홈페이지 새로고침"
+        >
           <Heart className="brand-icon" size={17} fill="currentColor" />
           <span>Our Travel</span>
         </a>

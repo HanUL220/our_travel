@@ -13,6 +13,9 @@ import {
   fetchPostsFromSupabase, 
   savePostToSupabase, 
   deletePostFromSupabase,
+  fetchSchedulesFromSupabase,
+  saveScheduleToSupabase,
+  deleteScheduleFromSupabase,
   isSupabaseConfigured 
 } from './utils/supabaseClient';
 
@@ -20,6 +23,7 @@ import PlacesCollection from './components/PlacesCollection';
 import PhotosGallery from './components/PhotosGallery';
 import KoreaMapCollection from './components/KoreaMapCollection';
 import PromiseCalendar from './components/PromiseCalendar';
+import TripPlannerView from './components/TripPlannerView';
 
 export default function App() {
   // Posts state with LocalStorage persistence & Supabase fallback
@@ -38,9 +42,23 @@ export default function App() {
     return [];
   });
 
+  // Trip Planner schedules state with LocalStorage persistence & Supabase sync
+  const [schedules, setSchedules] = useState(() => {
+    const saved = localStorage.getItem('our_travel_schedules');
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        return Array.isArray(parsed) ? parsed : [];
+      } catch {
+        return [];
+      }
+    }
+    return [];
+  });
+
   const [isLoading, setIsLoading] = useState(isSupabaseConfigured);
 
-  // View mode state: 'posts' (default feed) | 'places' (grouped by region) | 'photos' (gallery)
+  // View mode state: 'posts' | 'map' | 'photos' | 'calendar' | 'planner'
   const [viewMode, setViewMode] = useState('posts');
 
   // Theme state
@@ -73,7 +91,19 @@ export default function App() {
         setIsLoading(false);
       }
     }
+    async function loadCloudSchedules() {
+      if (!isSupabaseConfigured) return;
+      try {
+        const cloudSchedules = await fetchSchedulesFromSupabase();
+        if (cloudSchedules && Array.isArray(cloudSchedules)) {
+          setSchedules(cloudSchedules);
+        }
+      } catch (err) {
+        console.warn('Could not load schedules from Supabase, using local data:', err);
+      }
+    }
     loadCloudPosts();
+    loadCloudSchedules();
   }, []);
 
   // Sync theme with HTML document
@@ -86,6 +116,11 @@ export default function App() {
   useEffect(() => {
     localStorage.setItem('our_travel_posts', JSON.stringify(posts));
   }, [posts]);
+
+  // Sync schedules to LocalStorage as offline backup
+  useEffect(() => {
+    localStorage.setItem('our_travel_schedules', JSON.stringify(schedules));
+  }, [schedules]);
 
   const toggleTheme = () => {
     setTheme(prev => (prev === 'light' ? 'dark' : 'light'));
@@ -149,6 +184,37 @@ export default function App() {
     }
   };
 
+  const handleSaveSchedule = async (savedSchedule) => {
+    setSchedules(prev => {
+      const exists = prev.some(s => String(s.id) === String(savedSchedule.id));
+      if (exists) {
+        return prev.map(s => (String(s.id) === String(savedSchedule.id) ? savedSchedule : s));
+      }
+      return [savedSchedule, ...prev];
+    });
+
+    if (isSupabaseConfigured) {
+      try {
+        await saveScheduleToSupabase(savedSchedule);
+      } catch (err) {
+        console.error('Failed to sync schedule to Supabase:', err);
+        alert('클라우드 저장 중 오류가 발생하여 기기 로컬에 임시 저장되었습니다. (trip_schedules 테이블을 확인해 주세요)');
+      }
+    }
+  };
+
+  const handleDeleteSchedule = async (scheduleId) => {
+    setSchedules(prev => prev.filter(s => String(s.id) !== String(scheduleId)));
+
+    if (isSupabaseConfigured) {
+      try {
+        await deleteScheduleFromSupabase(scheduleId);
+      } catch (err) {
+        console.error('Failed to delete schedule from Supabase:', err);
+      }
+    }
+  };
+
   // Filter posts based on search query across title, location, dates, summary, and block contents
   const filteredPosts = posts.filter(post => {
     const q = searchQuery.toLowerCase().trim();
@@ -207,7 +273,7 @@ export default function App() {
           onViewChange={setViewMode}
         />
 
-        {viewMode !== 'calendar' && (
+        {viewMode !== 'calendar' && viewMode !== 'planner' && (
           <FilterBar 
             searchQuery={searchQuery}
             onSearchChange={setSearchQuery}
@@ -217,6 +283,13 @@ export default function App() {
         {/* View Mode Switching */}
         {viewMode === 'calendar' ? (
           <PromiseCalendar 
+            onResetView={() => setViewMode('posts')}
+          />
+        ) : viewMode === 'planner' ? (
+          <TripPlannerView
+            schedules={schedules}
+            onSaveSchedule={handleSaveSchedule}
+            onDeleteSchedule={handleDeleteSchedule}
             onResetView={() => setViewMode('posts')}
           />
         ) : posts.length === 0 ? (

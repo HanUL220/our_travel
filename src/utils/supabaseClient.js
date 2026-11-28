@@ -240,3 +240,103 @@ export async function deletePostFromSupabase(postId) {
     throw err;
   }
 }
+
+// ============================================================================
+// Trip Planner (trip_schedules table) CRUD
+// ============================================================================
+
+/**
+ * Fetch all trip schedules from Supabase DB (trip_schedules)
+ */
+export async function fetchSchedulesFromSupabase() {
+  if (!isSupabaseConfigured || !supabase) return null;
+
+  try {
+    const { data, error } = await supabase
+      .from('trip_schedules')
+      .select('*')
+      .order('start_date', { ascending: false });
+
+    if (error) {
+      console.warn('Supabase trip_schedules fetch warning:', error.message);
+      return null;
+    }
+
+    if (!data || data.length === 0) {
+      return [];
+    }
+
+    return data.map(item => ({
+      id: item.id,
+      location: item.location || '',
+      tripType: item.trip_type || 'single',
+      startDate: item.start_date || '',
+      endDate: item.end_date || '',
+      date: item.date || '',
+      durationText: item.duration_text || '',
+      blocks: Array.isArray(item.blocks) ? item.blocks : (typeof item.blocks === 'string' ? JSON.parse(item.blocks) : []),
+      createdAt: item.created_at,
+      updatedAt: item.updated_at
+    }));
+  } catch (err) {
+    console.error('Failed to fetch trip_schedules from Supabase:', err);
+    return null;
+  }
+}
+
+/**
+ * Upsert (Create or Update) a trip schedule in Supabase (trip_schedules)
+ */
+export async function saveScheduleToSupabase(schedule) {
+  if (!isSupabaseConfigured || !supabase) return false;
+
+  try {
+    const record = {
+      id: String(schedule.id),
+      location: schedule.location,
+      trip_type: schedule.tripType,
+      start_date: schedule.startDate,
+      end_date: schedule.endDate,
+      date: schedule.date,
+      duration_text: schedule.durationText || '',
+      blocks: schedule.blocks || [],
+      updated_at: new Date().toISOString()
+    };
+
+    const { error } = await supabase
+      .from('trip_schedules')
+      .upsert(record);
+
+    if (error) {
+      console.error('Supabase save schedule error:', error);
+      throw error;
+    }
+    return true;
+  } catch (err) {
+    console.error('Save schedule to Supabase failed:', err);
+    throw err;
+  }
+}
+
+/**
+ * Delete a trip schedule from Supabase (trip_schedules)
+ */
+export async function deleteScheduleFromSupabase(scheduleId) {
+  if (!isSupabaseConfigured || !supabase) return false;
+
+  try {
+    const { error } = await supabase
+      .from('trip_schedules')
+      .delete()
+      .eq('id', String(scheduleId));
+
+    if (error) {
+      console.error('Supabase delete schedule error:', error);
+      throw error;
+    }
+    return true;
+  } catch (err) {
+    console.error('Delete schedule from Supabase failed:', err);
+    throw err;
+  }
+}

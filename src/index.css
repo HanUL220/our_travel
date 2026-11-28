@@ -5571,6 +5571,607 @@ textarea:focus {
   }
 }
 
+/* ==========================================================================
+   Trip Planner View (Triple-style Travel Schedule) - PC & Mobile Responsive
+   ========================================================================== */
+.trip-planner-container {
+  width: 100%;
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 0.5rem 0 3.5rem 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  box-sizing: border-box;
+  animation: appleFadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.planner-view-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  padding: 0.75rem 1.2rem;
+  background: var(--apple-surface);
+  border: 1px solid var(--apple-border);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-subtle);
+  box-sizing: border-box;
+}
+
+.planner-add-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.planner-detail-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+/* Empty State */
+.planner-empty-state {
+  text-align: center;
+  padding: 4.2rem 1.5rem;
+  background: var(--apple-surface);
+  border: 1px solid var(--apple-border);
+  border-radius: 24px;
+  box-shadow: var(--shadow-subtle);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.7rem;
+}
+
+.planner-empty-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: rgba(0, 113, 227, 0.08);
+  color: var(--apple-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 0.25rem;
+}
+
+.planner-empty-state h3 {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--apple-foreground);
+  margin: 0;
+}
+
+.planner-empty-state p {
+  font-size: 0.9rem;
+  color: var(--apple-muted);
+  margin: 0 0 0.75rem 0;
+  line-height: 1.5;
+  max-width: 360px;
+}
+
+/* Cards Grid (PC: 2 columns, Mobile: 1 column) */
+.planner-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.1rem;
+  width: 100%;
+}
+
+.planner-trip-card {
+  background: var(--apple-surface);
+  border: 1px solid var(--apple-border);
+  border-radius: 22px;
+  padding: 1.35rem 1.4rem;
+  box-shadow: var(--shadow-card);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.22s ease, border-color 0.22s ease;
+  box-sizing: border-box;
+}
+
+.planner-trip-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-hover);
+  border-color: var(--apple-border-strong);
+}
+
+.planner-trip-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.planner-trip-card-badges {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+
+.planner-card-arrow {
+  color: var(--apple-muted);
+  transition: transform 0.2s ease, color 0.2s ease;
+  flex-shrink: 0;
+}
+
+.planner-trip-card:hover .planner-card-arrow {
+  transform: translateX(3px);
+  color: var(--apple-primary);
+}
+
+.planner-dday-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 9px;
+  border-radius: var(--radius-pill);
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.planner-dday-badge.status-upcoming {
+  background: rgba(0, 113, 227, 0.12);
+  color: var(--apple-primary);
+}
+
+.planner-dday-badge.status-ongoing {
+  background: rgba(52, 199, 89, 0.14);
+  color: #28a745;
+}
+
+.planner-dday-badge.status-past {
+  background: var(--apple-canvas);
+  color: var(--apple-muted);
+  border: 1px solid var(--apple-border);
+}
+
+.planner-duration-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 9px;
+  border-radius: var(--radius-pill);
+  font-size: 11.5px;
+  font-weight: 600;
+  background: var(--apple-canvas);
+  color: var(--apple-foreground);
+  border: 1px solid var(--apple-border);
+}
+
+.planner-trip-location {
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--apple-foreground);
+  letter-spacing: -0.02em;
+  margin: 0.15rem 0 0 0;
+  word-break: keep-all;
+}
+
+.planner-trip-date {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.86rem;
+  color: var(--apple-muted);
+  font-weight: 500;
+}
+
+.planner-spot-preview-row {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+  margin-top: 0.25rem;
+}
+
+.planner-spot-preview-pill {
+  font-size: 11.5px;
+  font-weight: 500;
+  padding: 3px 9px;
+  border-radius: var(--radius-pill);
+  background: var(--apple-canvas);
+  color: var(--apple-foreground);
+  border: 1px solid var(--apple-border);
+  max-width: 140px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.planner-spot-preview-more {
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--apple-primary);
+  padding: 2px 6px;
+}
+
+.planner-trip-card-footer {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: auto;
+  padding-top: 0.65rem;
+  border-top: 1px solid var(--apple-border);
+  font-size: 12px;
+  color: var(--apple-muted);
+  font-weight: 500;
+}
+
+/* Detail View Hero */
+.planner-detail-hero {
+  background: var(--apple-surface);
+  border: 1px solid var(--apple-border);
+  border-radius: 24px;
+  padding: 1.5rem 1.75rem;
+  box-shadow: var(--shadow-card);
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.planner-detail-hero-top {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.planner-detail-location {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--apple-foreground);
+  letter-spacing: -0.025em;
+  margin: 0.1rem 0 0 0;
+}
+
+.planner-detail-meta {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-top: 0.15rem;
+}
+
+.planner-meta-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.88rem;
+  color: var(--apple-muted);
+  font-weight: 500;
+}
+
+/* Day Filter Tabs (Horizontal scrollable on mobile) */
+.planner-day-tabs-scroll {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 0.2rem 0.1rem 0.35rem 0.1rem;
+  scrollbar-width: none;
+}
+
+.planner-day-tabs-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.planner-day-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 7px 14px;
+  border-radius: var(--radius-pill);
+  background: var(--apple-surface);
+  border: 1px solid var(--apple-border);
+  color: var(--apple-muted);
+  font-size: 0.84rem;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.planner-day-tab:hover {
+  border-color: var(--apple-primary);
+  color: var(--apple-foreground);
+}
+
+.planner-day-tab.active {
+  background: var(--apple-primary);
+  border-color: var(--apple-primary);
+  color: #ffffff;
+  box-shadow: 0 3px 10px rgba(0, 113, 227, 0.25);
+}
+
+.planner-day-tab-date {
+  font-size: 0.76rem;
+  opacity: 0.82;
+  font-weight: 500;
+}
+
+/* Route Map wrapper inside detail */
+.planner-route-map-section {
+  width: 100%;
+}
+
+/* Triple-style Vertical Day Timeline */
+.planner-timeline-sections {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.planner-day-section {
+  background: var(--apple-surface);
+  border: 1px solid var(--apple-border);
+  border-radius: 24px;
+  padding: 1.4rem 1.5rem;
+  box-shadow: var(--shadow-subtle);
+}
+
+.planner-day-section-header {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  margin-bottom: 1.2rem;
+  padding-bottom: 0.8rem;
+  border-bottom: 1px solid var(--apple-border);
+}
+
+.planner-day-badge {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--apple-primary);
+  background: rgba(0, 113, 227, 0.1);
+  padding: 4px 12px;
+  border-radius: var(--radius-pill);
+}
+
+.planner-day-date {
+  font-size: 0.85rem;
+  color: var(--apple-muted);
+  font-weight: 500;
+}
+
+.planner-day-empty-note {
+  font-size: 0.88rem;
+  color: var(--apple-muted);
+  padding: 0.5rem 0;
+}
+
+.planner-vertical-timeline {
+  display: flex;
+  flex-direction: column;
+}
+
+.planner-timeline-row {
+  display: flex;
+  align-items: stretch;
+  gap: 0.9rem;
+}
+
+.planner-timeline-rail {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 28px;
+  flex-shrink: 0;
+}
+
+.planner-timeline-dot {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--apple-primary) 0%, #e11d48 100%);
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 2px 6px rgba(255, 78, 120, 0.28);
+  margin-top: 0.85rem;
+}
+
+.planner-timeline-memo-dot {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--apple-canvas);
+  border: 1px solid var(--apple-border-strong);
+  color: var(--apple-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 0.85rem;
+}
+
+.planner-timeline-line {
+  width: 2px;
+  flex: 1;
+  background: var(--apple-border);
+  margin: 4px 0;
+  min-height: 16px;
+}
+
+.planner-timeline-row:last-child .planner-timeline-line {
+  display: none;
+}
+
+.planner-timeline-card {
+  flex: 1;
+  min-width: 0;
+  margin-bottom: 0.85rem;
+  border-radius: 16px;
+  box-sizing: border-box;
+}
+
+.planner-timeline-row:last-child .planner-timeline-card {
+  margin-bottom: 0;
+}
+
+.planner-place-card {
+  background: var(--apple-canvas);
+  border: 1px solid var(--apple-border);
+  padding: 0.9rem 1.1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.85rem;
+  flex-wrap: wrap;
+  transition: border-color 0.2s ease;
+}
+
+.planner-place-card:hover {
+  border-color: var(--apple-border-strong);
+}
+
+.planner-place-card-main {
+  flex: 1;
+  min-width: 180px;
+}
+
+.planner-place-name {
+  font-size: 0.98rem;
+  font-weight: 600;
+  color: var(--apple-foreground);
+  letter-spacing: -0.015em;
+  word-break: break-word;
+}
+
+.planner-place-addr {
+  font-size: 0.8rem;
+  color: var(--apple-muted);
+  margin-top: 0.25rem;
+  line-height: 1.4;
+  word-break: break-word;
+}
+
+.planner-place-links {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-shrink: 0;
+}
+
+.planner-memo-card {
+  background: rgba(255, 204, 0, 0.08);
+  border: 1px solid rgba(255, 193, 7, 0.28);
+  padding: 0.85rem 1.05rem;
+}
+
+[data-theme='dark'] .planner-memo-card {
+  background: rgba(255, 214, 10, 0.08);
+  border-color: rgba(255, 214, 10, 0.22);
+}
+
+.planner-memo-text {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.6;
+  color: var(--apple-foreground);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.planner-empty-detail {
+  text-align: center;
+  padding: 3rem 1.5rem;
+  background: var(--apple-surface);
+  border: 1px solid var(--apple-border);
+  border-radius: 22px;
+  color: var(--apple-muted);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.planner-empty-blocks-hint {
+  text-align: center;
+  padding: 1.5rem 1rem;
+  font-size: 0.85rem;
+  color: var(--apple-muted);
+  background: var(--apple-surface);
+  border: 1px dashed var(--apple-border);
+  border-radius: var(--radius-control);
+}
+
+.planner-memo-textarea {
+  resize: vertical;
+  min-height: 76px;
+  line-height: 1.55;
+}
+
+/* Mobile Optimization for Trip Planner */
+@media (max-width: 680px) {
+  .planner-view-header {
+    padding: 0.65rem 0.9rem;
+  }
+
+  .planner-cards-grid {
+    grid-template-columns: 1fr;
+    gap: 0.85rem;
+  }
+
+  .planner-trip-card {
+    padding: 1.15rem 1.15rem;
+    border-radius: 18px;
+  }
+
+  .planner-trip-location {
+    font-size: 1.2rem;
+  }
+
+  .planner-detail-hero {
+    padding: 1.2rem 1.15rem;
+    border-radius: 20px;
+  }
+
+  .planner-detail-location {
+    font-size: 1.45rem;
+  }
+
+  .planner-day-section {
+    padding: 1.1rem 1rem;
+    border-radius: 20px;
+  }
+
+  .planner-timeline-row {
+    gap: 0.65rem;
+  }
+
+  .planner-place-card {
+    padding: 0.8rem 0.9rem;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.6rem;
+  }
+
+  .planner-place-card-main {
+    min-width: 0;
+    width: 100%;
+  }
+
+  .planner-place-links {
+    width: 100%;
+  }
+
+  .planner-add-block-bar {
+    grid-template-columns: repeat(3, 1fr) !important;
+  }
+}
+
 
 
 
